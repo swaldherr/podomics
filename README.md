@@ -25,7 +25,7 @@ Running tests:
 
 Compiling documentation:
 
-	pdoc3 --html --force podomics
+	pdoc3 --html -o docs --force podomics
 
 ### Author ###
 

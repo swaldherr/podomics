@@ -66,10 +66,11 @@ class TestRescaling(TestCase):
         ds = d.rescale()
         self.assertEqual(ds.data["F1"].max(), 1.0)
         self.assertEqual(ds.data["F2"].max(), 1.0)
-        d.rescale(conditions=["a"])
+        ds = d.rescale(conditions=["a"])
         self.assertEqual(ds.data["F1"].max(), 1.0)
         self.assertEqual(ds.data["F2"].max(), 1.0)
-        d.rescale(conditions=["a", "b"])
+        self.assertEqual(ds.data.shape[0], 2) # check restriction to condition "a"
+        ds = d.rescale(conditions=["a", "b"])
         self.assertEqual(ds.data["F1"].max(), 1.0)
         self.assertEqual(ds.data["F2"].max(), 1.0)
 

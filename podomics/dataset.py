@@ -2,6 +2,8 @@
 
 import numpy as np
 import pandas
+import matplotlib
+from matplotlib import pyplot
 from sklearn import preprocessing
 from sklearn.preprocessing import MaxAbsScaler
 
@@ -196,6 +198,116 @@ Example usage
         data_scaled = Dataset(df_scaled, time=self.time, condition=self.condition, features=features)
         data_scaled.scaling = method
         return data_scaled
+
+    def plot(self, ax=None, condition=None, features=None, colormap='viridis', legend=True):
+        """Plot the dataset.
+
+This method creates a scatterplot where feature values are plotted vs. feature index.
+Data from different timepoints can be colored differently via a colormap.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    If given: plot into these axes, otherwise create a new figure to plot in.
+condition : str or list of str, default=None
+    Choose the condition (from `Dataset.condition_list`) to plot.
+    If a list is given, plot all conditions in the list in subplots. This is only possible with a newly created figure.
+    Default is to plot all conditions in the dataset.
+features : list of str, default=None
+    List of features to include in the plot.
+    Default is to plot all features in the dataset.
+colormap : str or matplotlib Colormap, default='viridis'
+    Colormap to use for choosing the color for each timepoint.
+legend : Boolean, default=True
+    Set to `False` to not show the legend.
+    Labels on plotted objects are still assigned, so the legend can be created separately by calling `ax.legend()` on the plot axes.
+
+Returns
+---
+fig : matplotlib Figure object
+    Figure object created for the plot.
+    Only if `ax=None` is used, else nothing is returned.
+ax : list or single object of matplotlib Axes
+    Axes created for the different conditions that are plotted.
+    Only if `ax=None` is used, else nothing is returned.
+
+Example usage
+---
+Here we load a dataset with two conditions from the examples directory.
+
+    >>> omics = read_csv("examples/exampledata3.csv", sample="Sample", time="Timepoint", condition="Condition")
+
+A direct call to the plot method will create two subplots, one for each of the two conditions in that dataset:
+
+    >>> f, axs = omics.plot(condition=["a", "b"])
+    >>> f.savefig("docs/podomics/images/rawdata_plot3.png")
+
+In this example, the created figure and subplots are returned in the `f` and `axs` variables. 
+For that dataset, the plot should look like this:
+![image](./images/rawdata_plot3.png)
+"""
+        if self.condition is not None:
+            if condition is None:
+                conditions = self.condition_list
+            else:
+                conditions = condition if type(condition) is list else [condition,]
+                for c in conditions:
+                    if c not in self.condition_list:
+                        raise ValueError(f"Condition {c} not found in available dataset conditions: {self.condition_list}")
+            df = self.data.query(f"{self.condition} in @conditions") # TODO: check safety implications if hosting this on a server!
+        else:
+            df = self.data
+            conditions = [None,]
+
+        if ax is None:
+            fig, axs = pyplot.subplots(1, len(conditions))
+            axs[0].set_ylabel("Feature values")
+            for i in range(len(conditions)):
+                axs[i].set_xlabel("Feature index")
+                if self.condition is not None:
+                    axs[i].set_title("Condition " + conditions[i])
+            new_fig = True
+        else:
+            if len(conditions) > 1:
+                raise ValueError(f"Plotting in a given axes is only supported with a single condition, not for the list {conditions}")
+            new_fig = False
+            axs = [ax,]
+        if type(colormap) is str:
+            colormap = matplotlib.colormaps[colormap]
+
+        if features is None:
+            features = self.features
+        else:
+            for f in features:
+                if f not in self.features:
+                    raise ValueError(f"Feature {f} not found in available dataset features: {self.features}")
+
+        for i, ti in enumerate(self.timepoints):
+            df_ti = df[df[self.time] == ti]
+            # try to get the color by interpolating numerical values, otherwise just try to interpolate by index
+            try:
+                cvalue = ti / (self.timepoints[-1] - self.timepoints[0])
+            except TypeError:
+                cvalue = i / len(self.timepoints) 
+            color = colormap(cvalue)
+            is_labelled = [False,] * len(axs)
+            for j, rowj in enumerate(df_ti.iterrows()):
+                if len(conditions) > 1:
+                    axi = conditions.index(rowj[1].loc[self.condition])
+                else:
+                    axi = 0
+                ax = axs[axi]
+                if not is_labelled[axi]:
+                    ax.plot(np.arange(len(features))+(i)*0.3, rowj[1].loc[features].astype(np.float64), '.', c=color, label="Time " + str(ti))
+                    is_labelled[axi] = True
+                else:
+                    ax.plot(np.arange(len(features))+(i)*0.3/len(self.timepoints), rowj[1].loc[features].astype(np.float64), '.', c=color)
+        if legend:
+            for ax in axs:
+                ax.legend()
+        if new_fig:
+            return fig, axs
+
 
 from sklearn.utils.validation import (
     check_is_fitted,
