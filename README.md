@@ -1,6 +1,6 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+podomics is a Python package to do proper orthogonal decomposition (POD) on large-scale timeseries datasets such as from timeseries omics experiments.
 
 ### What is this repository for? ###
 
@@ -17,13 +17,16 @@ This README would normally document whatever steps are necessary to get your app
 * How to run tests
 * Deployment instructions
 
-### Contribution guidelines ###
+### Developer guidelines ###
 
-* Writing tests
-* Code review
-* Other guidelines
+Running tests:
 
-### Who do I talk to? ###
+	nosetests -v --with-coverage --cover-package=podomics --with-doctest podomics
 
-* Repo owner or admin
-* Other community or team contact
+Compiling documentation:
+
+	pdoc3 --html --force podomics
+
+### Author ###
+
+Steffen Waldherr <steffen.waldherr@univie.ac.at>
