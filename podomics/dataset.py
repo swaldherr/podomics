@@ -149,16 +149,27 @@ Example usage
 The data can optionally be filtered with the parameters **`conditions`** and **`features`** before the scaling.
 
 The scaled result is returned as a new **`Dataset`** object.
+The applied scaling method is stored in the `scaling` attribute of the returned `Dataset` object.
 
 Parameters
 ---
-method : object
+method : object, default=MaxAbsScaler() from sklearn.preprocessing
     Instance of a transformation class from [sklearn.preprocessing](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.preprocessing) to be used for resaling the data.
     For median scaling, the class `MedianScaler` provided in this module can be used.
+conditions: list of str, default=None
+    Restrict the data to conditions given here before scaling.
+features: list of str, default=None
+    Restrict the data to features given here before scaling.
+
+Returns
+---
+Dataset : object
+    Dataset with the scaled values.
+    The `scaling` attribute is set to the object passed in the `method` parameter.
 
 Example usage
 ---
-Load a dataset:
+#### Load a dataset
 
     >>> omics = read_csv("examples/exampledata1.csv", sample="Sample")
 
@@ -178,7 +189,7 @@ Load a dataset:
         if self.condition is None or conditions is None:
             df = self.data
         else:
-            df = self.data.query(f"{self.condition} in @conditions")
+            df = self.data.query(f"{self.condition} in @conditions") # TODO: check safety implications if hosting this on a server!
         method.fit(df.loc[:, features])
         df_scaled = df.copy()
         df_scaled.loc[:, features] = method.transform(df.loc[:, features])
