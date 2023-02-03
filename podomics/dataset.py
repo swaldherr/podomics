@@ -87,54 +87,60 @@ Example usage
         """
         self.data = data
         
-        num_cols = len(self.data.columns)
-        if time in self.data.columns:
+        num_cols = len(data.columns)
+        if time in data.columns:
             self.time = time
         else:
             if time is None:
                 # try to infer time column
-                for c in self.data.columns:
+                for c in data.columns:
                     if c.startswith("Time"):
                         time = c
                 if time is None:
-                    raise ValueError(f"Could not identify a time column in {self.data.columns[:min(num_cols, 5)]}..., use the `time` parameter to specify one.")
+                    raise ValueError(f"Could not identify a time column in {data.columns[:min(num_cols, 5)]}..., use the `time` parameter to specify one.")
                 else:
                     self.time = time
             else:
-                raise ValueError(f'Time column "{time}" not found in data columns: {self.data.columns[:min(num_cols, 5)]}...')
+                raise ValueError(f'Time column "{time}" not found in data columns: {data.columns[:min(num_cols, 5)]}...')
 
         if condition is None:
             self.condition_list = []
         else:
             if condition in self.data.columns:
-                self.condition_list = list(set(self.data[condition]))
+                self.condition_list = list(set(data[condition]))
             else:
-                raise ValueError(f'Condition column "{condition}" not found in data columns: {self.data.columns[:min(num_cols, 5)]}...')
+                raise ValueError(f'Condition column "{condition}" not found in data columns: {data.columns[:min(num_cols, 5)]}...')
         self.condition = condition
     
         if features is None:
-            self.features = [f for f in self.data.columns if f not in (self.time, self.condition)]
+            self.features = [f for f in data.columns if f not in (self.time, self.condition)]
         else:
-            self.features = [f for f in features if (f in self.data.columns) and f not in (self.time, self.condition)]
+            self.features = [f for f in features if (f in data.columns) and f not in (self.time, self.condition)]
             if len(self.features)==0:
                 raise ValueError(f"Did not find any of the given feature names in data columns: {self.data.columns[:min(num_cols, 5)]}...")
         # Check that all feature columns are numeric
         # https://stackoverflow.com/questions/19900202/how-to-determine-whether-a-column-variable-is-numeric-or-not-in-pandas-numpy
         from pandas.api.types import is_numeric_dtype
         for f in self.features:
-            if not is_numeric_dtype(self.data[f]):
+            if not is_numeric_dtype(data[f]):
                 raise ValueError(f'Column "{f}" was interpreted as feature, but is not numeric:\n{self.data[f].head()}')
+
+        self.scaling = None
+        timepoints = self.data[self.time].unique()
+        timepoints.sort()
+        self.timepoints = timepoints
+
+        if self.condition is None:
+            columns = [self.time,] + self.features
+        else:
+            columns = [self.condition, self.time] + self.features
+        self.data = data.loc[:, columns]
 
         # sort rows first by condition if used, then by timepoint
         if self.condition is not None:
             self.data.sort_values(by=[self.condition, self.time], inplace=True)
         else:
             self.data.sort_values(by=[self.time], inplace=True)
-
-        self.scaling = None
-        timepoints = self.data[self.time].unique()
-        timepoints.sort()
-        self.timepoints = timepoints
 
 
     def rescale(self, method=MaxAbsScaler(), conditions=None, features=None):
@@ -176,7 +182,7 @@ Load a dataset:
         method.fit(df.loc[:, features])
         df_scaled = df.copy()
         df_scaled.loc[:, features] = method.transform(df.loc[:, features])
-        data_scaled = Dataset(df_scaled, time=self.time, condition=self.condition, features=None)
+        data_scaled = Dataset(df_scaled, time=self.time, condition=self.condition, features=features)
         data_scaled.scaling = method
         return data_scaled
 
