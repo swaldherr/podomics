@@ -6,6 +6,7 @@ import pandas
 import matplotlib
 from matplotlib import pyplot
 
+from . import dataset
 from .dataset import Dataset
 
 class POD(object):
@@ -53,6 +54,12 @@ cluster : object
     Instance of the sklearn class which was used for clustering.
 cluster_components : int, default=1
     Number of singular vectors / principal components, in decreasing order of weight, on which to do the clustering.
+
+Example usage
+---
+#### Load a dataset to run POD on
+
+    >>> omics = dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition")
 """
         if features is None:
             self.features = ds.features
@@ -63,13 +70,14 @@ cluster_components : int, default=1
                 self.features = features
         if conditions is None:
             self.condition_list = ds.condition_list
+            df = ds.data
         else:
             for c in conditions:
                 if c not in ds.condition_list:
                     raise ValueError(f'Condition "{c}" not found in dataset condition list: {ds.condition_list}')
             self.condition_list = conditions
+            df = ds.data.query(f"{ds.condition} in @self.condition_list") # TODO: check safety implications if hosting this on a server!
 
-        df = ds.data.query(f"{ds.condition} in @self.condition_list") # TODO: check safety implications if hosting this on a server!
         self.ds = Dataset(df, time=ds.time, condition=ds.condition, features=self.features)
         self.sample_weights, self.sing_values, Vt = linalg.svd(np.asarray(self.ds.data[self.features]))
         self.feature_weights = Vt.T
