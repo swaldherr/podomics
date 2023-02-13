@@ -145,13 +145,7 @@ Example usage
     0.00      -0.307343 -0.320584  0.245403
     0.25      -0.279958 -0.144988 -0.251014
 """
-        if self.ds.condition is not None:
-            if conditions is None:
-                conditions = self.condition_list
-            else:
-                for c in conditions:
-                    if c not in self.ds.condition_list:
-                        raise ValueError(f'Condition "{c}" not found in dataset condition list: {self.ds.condition_list}')
+        conditions = self._check_conditions(conditions)
         if timepoints is None:
             timepoints = self.ds.timepoints
         if self.ds.condition is None:
@@ -197,6 +191,11 @@ line_plot_args : dictionary, default={}
 Returns
 ---
 If a new figure is created (`ax=None`), then the resulting Figure and Axes object are returned.
+
+Example usage
+---
+    >>> pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
+    >>> fig, ax = pod_result.plot_singular_values(fit_line=0.7)
 """
         if ax is None:
             fig, ax = pyplot.subplots(1, 1)
@@ -236,6 +235,11 @@ If a new figure is created (`ax=None`), then the resulting Figure and Axes objec
 
     def plot_features(self, ax=None, components=(0, 1), features=None, labels=False, plotstyle=None, **kwargs):
         """Component weight plot of the features.
+
+Example usage
+---
+    >>> pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
+    >>> fig, ax = pod_result.plot_features(labels=True)
 """
         if ax is None:
             fig, ax = pyplot.subplots(1, 1)
@@ -260,3 +264,42 @@ If a new figure is created (`ax=None`), then the resulting Figure and Axes objec
             return fig, ax
                     
 
+
+    def plot_sample_weights(self, ax=None, components=[0], conditions=None, interpolate=False, labels=False, plotstyle=None, **kwargs):
+        """Plot timecourse of sample weights.
+
+Example usage
+---
+    >>> pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
+    >>> fig, ax = pod_result.plot_sample_weights(labels=True)
+"""
+        conditions = self._check_conditions(conditions)
+        if ax is None:
+            fig, ax = pyplot.subplots(1, len(components))
+            new_fig = True
+        else:
+            new_fig = False
+        if new_fig:
+            return fig, ax
+        
+
+
+    def _check_conditions(self, conditions):
+        """Check that all conditions are valid.
+
+Returns
+---
+List of conditions to use.
+
+Raises
+---
+`ValueError` if `conditions` is not a valid selection of conditions.
+"""
+        if self.ds.condition is not None:
+            if conditions is None:
+                conditions = self.condition_list
+            else:
+                for c in conditions:
+                    if c not in self.ds.condition_list:
+                        raise ValueError(f'Condition "{c}" not found in dataset condition list: {self.ds.condition_list}')
+        return conditions
