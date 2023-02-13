@@ -265,7 +265,7 @@ Example usage
                     
 
 
-    def plot_sample_weights(self, ax=None, components=[0], conditions=None, interpolate=False, labels=False, plotstyle=None, **kwargs):
+    def plot_sample_weights(self, axs=None, components=[0], conditions=None, interpolate=False, labels=False, plotstyle={'marker':'.', 'linestyle':''}, interp_style={}, **kwargs):
         """Plot timecourse of sample weights.
 
 Example usage
@@ -273,14 +273,34 @@ Example usage
     >>> pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
     >>> fig, ax = pod_result.plot_sample_weights(labels=True)
 """
-        conditions = self._check_conditions(conditions)
-        if ax is None:
-            fig, ax = pyplot.subplots(1, len(components))
+        if axs is None:
+            fig, axs = pyplot.subplots(1, len(components))
             new_fig = True
+            if len(components) == 1:
+                axs = [axs]
+            for ax in axs:
+                ax.set_xlabel(self.ds.time)
+            axs[0].set_ylabel("Weight")
         else:
+            if len(components) == 1:
+                axs = [axs]
             new_fig = False
+        if len(components) != len(axs):
+            raise ValueError(f"List `components` must have same length as `axs`, got {len(components)} vs {len(axs)}.")
+        conditions = self._check_conditions(conditions)
+        if self.ds.condition is not None and conditions is not None:
+            weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
+        else:
+            weights = self.sample_weights
+        if interpolate is not False:
+            method = interpolate if type(interpolate)==str else 'average'
+            interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+        for c, ax in zip(components, axs):
+            ax.plot(weights[self.ds.time], weights[c], **plotstyle)
+            if interpolate is not False:
+                ax.plot(interp_weights.index, interp_weights[c], **interp_style)
         if new_fig:
-            return fig, ax
+            return fig, axs
         
 
 
