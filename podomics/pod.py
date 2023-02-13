@@ -108,22 +108,58 @@ Clustering can be performed directly when running the analysis. Recommended clus
         if self.cluster is not None:
             self.labels = self.cluster.fit_predict(self.feature_weights[:, :cluster_components])
 
-    def interpolate_sample_weights(self, component, interpolation='average', conditions=None, timepoints=None):
-        """Compute interpolated sample weights for one component.
+    def interpolate_sample_weights(self, interpolation='average', conditions=None, timepoints=None):
+        """Compute interpolated sample weights.
+
+Used to approximate a timecourse of component weights for the given conditions.
+Depending on the interpolation method, for each condition, a time course of weights for each component is computed based on the weights of
+individual samples from that condition.
+
+Parameters
+---
+interpolation : str
+    * 'average': average samples from the same time point, no interpolation among different time points
+    Currently only this method is implemented.
+conditions : list of str, default=None
+    List of conditions to retain, default all.
+timepoints : list of timepoint labels / array, default=None
+    List of timepoints for which to compute interpolated weights, 
+    default is the list of timepoints in the dataset.
+    With `interpolation='average'`, the timepoints given here must also be contained in the dataset!
+
+Returns
+---
+Dataframe with timepoints as index, and interpolated component weights as columns.
+If a condition column is used, the result also contains that column information.
+Columns labelled with integers from 0 correspond to interpolated weights
+
+Example usage
+---
+    >>> pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
+    >>> average_weights = pod_result.interpolate_sample_weights()
 """
-        if conditions is None:
-            conditions = self.condition_list
-        else:
-            for c in conditions:
-                if c not in ds.condition_list:
-                    raise ValueError(f'Condition "{c}" not found in dataset condition list: {self.condition_list}')
-            self.condition_list = conditions
-        weights = self.sample_weights[:, component]
+        if self.ds.condition is not None:
+            if conditions is None:
+                conditions = self.condition_list
+            else:
+                for c in conditions:
+                    if c not in self.ds.condition_list:
+                        raise ValueError(f'Condition "{c}" not found in dataset condition list: {self.ds.condition_list}')
         if timepoints is None:
             timepoints = self.ds.timepoints
-        weights = np.zeros(len(timepoints))
+        if self.ds.condition is None:
+            df = self.sample_weights
+        else:
+            df = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
         if interpolation == 'average':
-            pass
+            df = df[df[self.ds.time].isin(timepoints)]
+            if self.ds.condition is not None:
+                res = [df[df[self.ds.condition]==c].groupby(self.ds.time).mean(numeric_only=True) for c in conditions]
+                for i,c in enumerate(conditions):
+                    res[i].insert(0, self.ds.condition, c)
+                return pandas.concat(res)
+            else:
+                return df.groupby(self.ds.time).mean()
         else:
             raise ValueError(f"""Only "interpolation='average'" is currently implemented, not "{interpolation}".""")
             
