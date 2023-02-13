@@ -1,5 +1,5 @@
 """
-Tests for dataset module
+Tests for pod module
 """
 
 from unittest import TestCase

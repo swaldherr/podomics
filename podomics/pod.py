@@ -60,6 +60,24 @@ Example usage
 #### Load a dataset to run POD on
 
     >>> omics = dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition")
+
+#### Run POD on the dataset
+
+To run POD on the full dataset, create a new `POD` object with the dataset as argument:
+
+    >>> pod_result = POD(omics)
+
+To use only a subset of the data, create the `POD` object with the appropriate lists in the `features` and/or `conditions` keyword arguments:
+
+    >>> pod_result = POD(omics, conditions=['a'])
+
+Clustering can be performed directly when running the analysis. Recommended clustering methods are [`KMeans`](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html) and [`GaussianMixture`](https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html) from the [`sklearn`](https://scikit-learn.org) package.
+
+    >>> from sklearn.cluster import KMeans
+    >>> pod_result = POD(omics, cluster=KMeans(n_clusters=3, n_init='auto'), cluster_components=4)
+
+    >>> from sklearn.mixture import GaussianMixture
+    >>> pod_result = POD(omics, cluster=GaussianMixture(n_components=3), cluster_components=4)
 """
         if features is None:
             self.features = ds.features
