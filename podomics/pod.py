@@ -131,12 +131,19 @@ Returns
 ---
 Dataframe with timepoints as index, and interpolated component weights as columns.
 If a condition column is used, the result also contains that column information.
-Columns labelled with integers from 0 correspond to interpolated weights
+Columns labelled with integers from 0 correspond to interpolated weights for the components in order of decreasing singular values.
+
+**Note:** If multiple conditions are in the dataset, the timepoint index in the result may not be unique!
 
 Example usage
 ---
-    >>> pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
+    >>> pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
     >>> average_weights = pod_result.interpolate_sample_weights()
+    >>> average_weights.iloc[:2,:3]
+                      0         1         2
+    Timepoint                              
+    0.00      -0.307343 -0.320584  0.245403
+    0.25      -0.279958 -0.144988 -0.251014
 """
         if self.ds.condition is not None:
             if conditions is None:
