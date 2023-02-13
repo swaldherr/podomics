@@ -42,8 +42,8 @@ condition_list : list of str or None
 sing_values : array
     One-dimensional array of singular values resulting from the POD. 
     The length of the array is either the number of considered features or the number of considered samples, depending on what is smaller.
-sample_weights : array
-    Two-dimensional array of sample weights in the POD.
+sample_weights : DataFrame
+    Pandas dataframe of sample weights in the POD.
     The array shape is equal to the number of considered samples by the number of singular values.
     This is equal to the left singular vectors of the considered data matrix.
 feature_weights : array
@@ -94,11 +94,15 @@ Clustering can be performed directly when running the analysis. Recommended clus
                 if c not in ds.condition_list:
                     raise ValueError(f'Condition "{c}" not found in dataset condition list: {ds.condition_list}')
             self.condition_list = conditions
-            df = ds.data.query(f"{ds.condition} in @self.condition_list") # TODO: check safety implications if hosting this on a server!
+            df = ds.data[ds.data[ds.condition].isin(conditions)]
 
         self.ds = Dataset(df, time=ds.time, condition=ds.condition, features=self.features)
-        self.sample_weights, self.sing_values, Vt = linalg.svd(np.asarray(self.ds.data[self.features]))
+        U, self.sing_values, Vt = linalg.svd(np.asarray(self.ds.data[self.features]))
         self.feature_weights = Vt.T
+        self.sample_weights = pandas.DataFrame(U, index=df.index)
+        self.sample_weights.insert(0, self.ds.time, self.ds.data[self.ds.time])
+        if self.ds.condition is not None:
+            self.sample_weights.insert(0, self.ds.condition, self.ds.data[self.ds.condition])
 
         self.cluster = cluster
         if self.cluster is not None:

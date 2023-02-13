@@ -191,7 +191,7 @@ Example usage
         if self.condition is None or conditions is None:
             df = self.data
         else:
-            df = self.data.query(f"{self.condition} in @conditions") # TODO: check safety implications if hosting this on a server!
+            df = self.data[self.data[self.condition].isin(conditions)]
         method.fit(df.loc[:, features])
         df_scaled = df.copy()
         df_scaled.loc[:, features] = method.transform(df.loc[:, features])
@@ -254,7 +254,7 @@ For that dataset, the plot should look like this:
                 for c in conditions:
                     if c not in self.condition_list:
                         raise ValueError(f"Condition {c} not found in available dataset conditions: {self.condition_list}")
-            df = self.data.query(f"{self.condition} in @conditions") # TODO: check safety implications if hosting this on a server!
+            df = self.data[self.data[self.condition].isin(conditions)]
         else:
             df = self.data
             conditions = [None,]
