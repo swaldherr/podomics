@@ -250,7 +250,7 @@ For that dataset, the plot should look like this:
             if condition is None:
                 conditions = self.condition_list
             else:
-                conditions = condition if type(condition) is list else [condition,]
+                conditions = [condition,] if isinstance(condition, str) else condition
                 for c in conditions:
                     if c not in self.condition_list:
                         raise ValueError(f"Condition {c} not found in available dataset conditions: {self.condition_list}")
@@ -272,7 +272,7 @@ For that dataset, the plot should look like this:
                 raise ValueError(f"Plotting in a given axes is only supported with a single condition, not for the list {conditions}")
             new_fig = False
             axs = [ax,]
-        if type(colormap) is str:
+        if isinstance(colormap, str):
             colormap = matplotlib.colormaps[colormap]
 
         if features is None:
