@@ -328,8 +328,7 @@ Example usage
         if len(components) != len(axs):
             raise ValueError(f"List `components` must have same length as `axs`, got {len(components)} vs {len(axs)}.")
         conditions = self._check_conditions(conditions)
-        use_conditions = self.ds.condition is not None and conditions is not None
-        if use_conditions:
+        if conditions is not None:
             weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
         else:
             weights = self.sample_weights
@@ -337,7 +336,7 @@ Example usage
             method = interpolate if type(interpolate)==str else 'average'
             interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
         for comp, ax in zip(components, axs):
-            if use_conditions:
+            if conditions is not None:
                 for cond in conditions:
                     ax.plot(weights[weights[self.ds.condition]==cond][self.ds.time], weights[weights[self.ds.condition]==cond][comp], label=cond, **plotstyle)
                     if interpolate is not False:
@@ -374,4 +373,6 @@ Raises
                 for c in conditions:
                     if c not in self.ds.condition_list:
                         raise ValueError(f'Condition "{c}" not found in dataset condition list: {self.ds.condition_list}')
+        else:
+            conditions = None
         return conditions
