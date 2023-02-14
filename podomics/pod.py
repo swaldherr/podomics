@@ -163,7 +163,44 @@ Example usage
                 return df.groupby(self.ds.time).mean()
         else:
             raise ValueError(f"""Only "interpolation='average'" is currently implemented, not "{interpolation}".""")
-            
+
+    def get_component(self, component=0):
+        """Compute reconstructed data for a single component.
+
+This function computes the data reconstruction for a single component.
+The result is returned in a
+
+Parameters
+---
+component : int, default=0
+    Index of the component for which to do the reconstruction.
+
+Returns
+---
+DataFrame : 
+    Pandas `DataFrame` with the same structure as the dataset that the POD was computed for.
+
+Example usage
+---
+    >>> pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
+    >>> df = pod_result.get_component(0)
+    >>> df.iloc[:3, :4]
+            Timepoint         0         1         2
+    Sample                                         
+    T0R0          0.0  0.803708  0.746042  0.753983
+    T0R1          0.0  0.791919  0.735099  0.742923
+    T0R2          0.0  0.811034  0.752842  0.760856
+"""
+        Ui = np.atleast_2d(self.sample_weights[component].to_numpy())
+        Vi = np.atleast_2d(self.feature_weights[:,component])
+        data = Ui.T.dot(Vi) * self.sing_values[component]
+        df = pandas.DataFrame(data, columns=self.features, index=self.ds.data.index)
+        df.insert(0, self.ds.time, self.ds.data[self.ds.time])
+        if self.ds.condition is not None:
+            df.insert(0, self.ds.condition, self.ds.data[self.ds.condition])
+        return df
+
+
     def plot_singular_values(self, ax=None, trafo=None, fit_line=False, line_plot_args={}, **kwargs):
         """Plot the singular values.
 

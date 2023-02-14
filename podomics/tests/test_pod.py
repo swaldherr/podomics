@@ -8,6 +8,9 @@ import pandas
 import os
 import numpy as np
 from sklearn import cluster
+from scipy import linalg
+
+from numpy import testing
 
 from .. import pod
 from .. import dataset
@@ -112,6 +115,23 @@ class TestInterpolateSamples(TestCase):
             if len(w.index) == len(timepoints):
                 for wi, ti in zip(w.index, timepoints):
                     self.assertEqual(wi, ti)
+
+class TestComputeComponent(TestCase):
+    """Test computation of component values."""
+    example_data = [f"examples/exampledata{i+1}.csv" for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample="Sample")) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample="Sample", condition="Condition")) )
+
+    def test_compute_component(self):
+        """
+        pod.POD.get_component(): testing component reconstruction.
+        """
+        for ex in self.examples:
+            for i,s in enumerate(ex.sing_values):
+                d_test = ex.get_component(component=i)
+                U, S, Vt = linalg.svd(ex.ds.data[ex.features])
+                d_ref = np.atleast_2d(U[:,i]).T.dot(np.atleast_2d(Vt[i,:])) * S[i]
+                testing.assert_allclose(d_test[ex.features].to_numpy(), d_ref)
 
 class TestSampleWeightPlot(TestCase):
     """Test plotting of sample weights."""
