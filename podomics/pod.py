@@ -256,6 +256,8 @@ Example usage
         if self.cluster is not None:
             for l in set(self.labels):
                 ax.plot(self.feature_weights[feature_index[self.labels==l], components[0]], self.feature_weights[feature_index[self.labels==l], components[1]], '.')
+        else:
+            ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], '.')
         if labels is not False:
             if labels is True:
                 for f, fi in zip(features, feature_index):
