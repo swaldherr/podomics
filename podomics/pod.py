@@ -278,8 +278,9 @@ Example usage
             new_fig = True
             if len(components) == 1:
                 axs = [axs]
-            for ax in axs:
+            for ax,c in zip(axs, components):
                 ax.set_xlabel(self.ds.time)
+                ax.set_title(f"Component #{c}")
             axs[0].set_ylabel("Weight")
         else:
             if len(components) == 1:
@@ -288,17 +289,29 @@ Example usage
         if len(components) != len(axs):
             raise ValueError(f"List `components` must have same length as `axs`, got {len(components)} vs {len(axs)}.")
         conditions = self._check_conditions(conditions)
-        if self.ds.condition is not None and conditions is not None:
+        use_conditions = self.ds.condition is not None and conditions is not None
+        if use_conditions:
             weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
         else:
             weights = self.sample_weights
         if interpolate is not False:
             method = interpolate if type(interpolate)==str else 'average'
             interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
-        for c, ax in zip(components, axs):
-            ax.plot(weights[self.ds.time], weights[c], **plotstyle)
-            if interpolate is not False:
-                ax.plot(interp_weights.index, interp_weights[c], **interp_style)
+        for comp, ax in zip(components, axs):
+            if use_conditions:
+                for cond in conditions:
+                    ax.plot(weights[weights[self.ds.condition]==cond][self.ds.time], weights[weights[self.ds.condition]==cond][comp], label=cond, **plotstyle)
+                    if interpolate is not False:
+                        cond_weights = interp_weights[interp_weights[self.ds.condition]==cond]
+                        ax.plot(cond_weights.index, cond_weights[comp], label=f"{cond} (interp.)", **interp_style)
+                ax.legend()
+            else:
+                ax.plot(weights[self.ds.time], weights[comp], **plotstyle)
+                if interpolate is not False:
+                    ax.plot(interp_weights.index, interp_weights[comp], **interp_style)
+            if labels:
+                for i, l in enumerate(weights.index):
+                    ax.annotate( l, (weights[self.ds.time][i], weights[comp][i]) )
         if new_fig:
             return fig, axs
         

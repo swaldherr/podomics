@@ -112,3 +112,24 @@ class TestInterpolateSamples(TestCase):
             if len(w.index) == len(timepoints):
                 for wi, ti in zip(w.index, timepoints):
                     self.assertEqual(wi, ti)
+
+class TestSampleWeightPlot(TestCase):
+    """Test plotting of sample weights."""
+    example_data = [f"examples/exampledata{i+1}.csv" for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample="Sample")) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample="Sample", condition="Condition")) )
+
+    def test_default_call(self):
+        """
+        pod.POD.plot_sample_weights(): test default call.
+        """
+        for ex in self.examples:
+            fig, ax = ex.plot_sample_weights()
+
+    def test_with_interpolated(self):
+        """
+        pod.POD.plot_sample_weights(): test with conditions.
+        """
+        for ex in self.examples:
+            fig, ax = ex.plot_sample_weights(interpolate=True)
+            
