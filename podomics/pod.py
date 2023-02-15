@@ -352,7 +352,113 @@ Example usage
                     ax.annotate( l, (weights[self.ds.time][i], weights[comp][i]) )
         if new_fig:
             return fig, axs
+
         
+    def plot_data_reconstruction(self, ax=None):
+        """Plot data reconstruction
+        """
+
+    def plot_feature_trajectories(self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=False, clusters=None, labels=False, **kwargs):
+        """Plot trajectories of individual features in component space.
+
+Arguments
+---
+conditions : list of str, default=None
+    List of conditions to plot.
+
+Example usage
+---
+    >>> pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
+    >>> fig, ax = pod_result.plot_feature_trajectories()
+        """
+        conditions = self._check_conditions(conditions)
+        if ax is None:
+            if conditions is not None:
+                fig, axs = pyplot.subplots(1, len(conditions))
+            else:
+                fig, ax = pyplot.subplots(1, 1)
+                axs = [ax,]
+            for i, ax in enumerate(axs):
+                ax.set_xlabel(f"Component #{components[0]}")
+                if conditions is not None:
+                    ax.set_title(f"{self.ds.condition} {conditions[i]}")
+            axs[0].set_ylabel(f"Component #{components[1]}")
+            new_fig = True
+        else:
+            axs = [ax,]
+            new_fig = False
+
+        if features is None:
+            features = self.features
+            feature_index = np.array(range(len(self.features)))
+        else:
+            feature_index = np.array([self.features.index(f) for f in features])
+
+        if conditions is not None:
+            weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
+        else:
+            weights = self.sample_weights
+        if interpolate is not False:
+            method = interpolate if isinstance(interpolate, str) else 'average'
+            interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+
+        for f, fi in zip(features, feature_index):
+            if conditions is not None:
+                for i,c in enumerate(conditions):
+                    traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
+                    traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
+            else:
+                traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
+                traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
+                axs[0].plot(traj0, traj1, '.', **kwargs)
+
+        # if False: #self.cluster is not None:
+        #     for l in set(self.labels):
+        #         ax.plot(self.feature_weights[feature_index[self.labels==l], components[0]], self.feature_weights[feature_index[self.labels==l], components[1]], '.')
+        # else:
+        #     ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], '.')
+        if new_fig:
+            return fig, ax
+        
+    def plot_feature_data_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, annotate=None, **kwargs):
+        """Plot feature trajectories in given Axes.
+
+Plot data from a single condition.
+Plot only selected clusters.
+
+Example usage
+---
+    >>> from matplotlib import pyplot
+    >>> fig, ax = pyplot.subplots(1, 1)
+    >>> pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
+    >>> pod_result.plot_feature_data_in(ax)
+"""
+        conditions = self._check_conditions(condition)
+        condition = conditions[0] if conditions is not None else None
+        df0 = self.get_component(components[0])
+        df1 = self.get_component(components[1])
+        if condition is not None and self.ds.condition is not None:
+            df0 = df0[df0[self.ds.condition] == condition]
+            df1 = df1[df1[self.ds.condition] == condition]
+        if features is None:
+            fs = self.features
+        else:
+            fs = features
+        # features = np.asarray(features)
+        if clusters is not None and self.cluster is not None:
+            features = [f for f,l in zip(self.features, self.labels) if f in fs and l in clusters]
+        else:
+            features = fs
+        labelled = False
+        for f in features:
+            if condition is not None and not labelled:
+                ax.plot(df0[f], df1[f], '.', label=f"{self.ds.condition} {condition}", **kwargs)
+                labelled = True
+            else:
+                ax.plot(df0[f], df1[f], '.', **kwargs)
+            if annotate is not None:
+                for a in annotate:
+                    ax.annotate(f, (df0.loc[a,f], df1.loc[a,f]) )
 
 
     def _check_conditions(self, conditions):
