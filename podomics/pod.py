@@ -270,13 +270,39 @@ Example usage
         if new_fig:
             return fig, ax
 
-    def plot_features(self, ax=None, components=(0, 1), features=None, labels=False, plotstyle=None, **kwargs):
+    def plot_features(self, ax=None, components=(0, 1), features=None, annotate=False, labels=None, **kwargs):
         """Component weight plot of the features.
+
+Plots the weights of features in two components as a scatter plot.
+Each data point in the plot corresponds to one feature, where the x-value is the weight of this feature in the first indicated component,
+and the y-value is the weight of this feature in the second indicated component.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    Axes to plot into, if `None` a new axis is created.
+components : tuple of two int values, default=(0, 1)
+    Components to consider for plotting.
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+features : list of str, default=None
+    List of features to include in the plot. If `None`, plot all features.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib `annotate` method.
+    To label only selected features, pass the identifiers of the desired features as list.
+labels : str, default=None
+    Which labels to assign for a possible plot legend.
+    By default, no labels are assigned.
+    With `labels='clusters'`, labels according to the cluster numbers are assigned.
+    If this argument is not `None` and a new figure is created, also shows the legend.
+    If plotting in a given Axes, the legend has to be activated separately.
+**kwargs : 
+    Additional arguments are passed to matplotlib's `plot` function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle `'.'` is used.
 
 Example usage
 ---
     >>> pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
-    >>> fig, ax = pod_result.plot_features(labels=True)
+    >>> fig, ax = pod_result.plot_features(annotate=True)
 """
         if ax is None:
             fig, ax = pyplot.subplots(1, 1)
@@ -292,13 +318,21 @@ Example usage
             feature_index = np.array([self.features.index(f) for f in features])
         if self.cluster is not None:
             for l in set(self.labels):
-                ax.plot(self.feature_weights[feature_index[self.labels==l], components[0]], self.feature_weights[feature_index[self.labels==l], components[1]], '.')
+                x = self.feature_weights[feature_index[self.labels==l], components[0]]
+                y = self.feature_weights[feature_index[self.labels==l], components[1]]
+                label = f"Cluster {l}" if labels=='cluster' else None
+                if len(kwargs):
+                    ax.plot(x, y, label=label, **kwargs)
+                else:
+                    ax.plot(x, y, '.', label=label)
         else:
             ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], '.')
-        if labels is not False:
-            if labels is True:
-                for f, fi in zip(features, feature_index):
-                    ax.annotate(f, ((self.feature_weights[fi, components[0]], self.feature_weights[fi, components[1]])))
+        if annotate is not False:
+            if annotate is True:
+                annotate = features
+            for f in annotate:
+                fi = self.features.index(f)
+                ax.annotate(f, ((self.feature_weights[fi, components[0]], self.feature_weights[fi, components[1]])))
         if new_fig:
             return fig, ax
                     
