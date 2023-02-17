@@ -336,6 +336,101 @@ Example usage
         if new_fig:
             return fig, ax
                     
+    def plot_samples(self, ax=None, components=(0, 1), samples=None, annotate=False, labels=None, **kwargs):
+        """Component weight plot of the samples.
+
+Plots the weights of samples in two components as a scatter plot.
+Each data point in the plot corresponds to one sample, where the x-value is the weight of this sample in the first indicated component,
+and the y-value is the weight of this sample in the second indicated component.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    Axes to plot into, if `None` a new axis is created.
+components : tuple of two int values, default=(0, 1)
+    Components to consider for plotting.
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+samples : list of str, default=None
+    List of samples (by IDs) to include in the plot. If `None`, plot all samples.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the sample IDs, using the matplotlib `annotate` method.
+    To label only selected samples, pass the IDs of the desired samples as list.
+labels : str, default=None
+    Can be used to either label conditions or timepoints for a plot legend.
+    Options are:
+    - `'condition'` : use condition names as labels.
+    - `'time`' : use timepoint identifiers as labels.
+    - `'both`' : include both condition and timepoint identifiers in the labels (only recommended with few samples / many replicates)
+    When using that option, different conditions / timepoints are plotted with different colors, unless a custom plotstyle is used.
+**kwargs : 
+    Additional arguments are passed to matplotlib's `plot` function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle `'.'` is used.
+
+Example usage
+---
+    >>> pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
+    >>> fig, ax = pod_result.plot_samples(annotate=True, labels='condition')
+"""
+        if ax is None:
+            fig, ax = pyplot.subplots(1, 1)
+            ax.set_xlabel(f"Component {components[0]}")
+            ax.set_ylabel(f"Component {components[1]}")
+            new_fig = True
+        else:
+            new_fig = False
+        if samples is None:
+            samples = [s for s in self.ds.data.index]
+            sample_index = np.array(range(len(samples)))
+        else:
+            sample_index = np.array([samples.index(s) for s in samples])
+        data = self.sample_weights.iloc[sample_index, :]
+        have_plot = False
+        if labels is not None:
+            if labels == 'condition':
+                if self.ds.condition is not None:
+                    for c in self.ds.condition_list:
+                        plotsamples = data[data[self.ds.condition] == c]
+                        if len(kwargs) > 0:
+                            ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f"{self.ds.condition} {c}", **kwargs)
+                        else:
+                            ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], '.', label=f"{self.ds.condition} {c}")
+                    have_plot = True
+            elif labels == 'time':
+                for t in self.ds.timepoints:
+                    plotsamples = data[data[self.ds.time] == t]
+                    if len(kwargs) > 0:
+                        ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f"{self.ds.time} {t}", **kwargs)
+                    else:
+                        ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], '.', label=f"{self.ds.time} {t}")
+                have_plot = True
+            elif labels == 'both':
+                if self.ds.condition is None:
+                    self.plot_samples(ax=ax, components=components, samples=samples, labels='time', annotate=annotate, **kwargs)
+                else:
+                    for c in self.ds.condition_list:
+                        for t in self.ds.timepoints:
+                            plotsamples = data[(data[self.ds.condition] == c) & (data[self.ds.time] == t)]
+                            if len(kwargs) > 0:
+                                ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f"{c} @ {t}", **kwargs)
+                            else:
+                                ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], '.', label=f"{c} @ {t}")
+                have_plot = True
+            else:
+                raise ValueError(f"Option '{labels}' is not available for the 'labels' keyword argument.")
+            if new_fig and have_plot:
+                ax.legend()
+        if not have_plot:
+            if len(kwargs) > 0:
+                ax.plot(data[(components[0])], data[(components[1])], **kwargs)
+            else:
+                ax.plot(data[(components[0])], data[(components[1])], '.')
+        if annotate is not False:
+            if annotate is True:
+                annotate = samples
+            for s in annotate:
+                ax.annotate(s, ((data.loc[s, (components[0])], data.loc[s, (components[1])])))
+        if new_fig:
+            return fig, ax
 
 
     def plot_sample_weights(self, axs=None, components=[0], conditions=None, interpolate=False, labels=False, plotstyle={'marker':'.', 'linestyle':''}, interp_style={}, **kwargs):

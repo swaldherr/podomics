@@ -133,6 +133,40 @@ class TestComputeComponent(TestCase):
                 d_ref = np.atleast_2d(U[:,i]).T.dot(np.atleast_2d(Vt[i,:])) * S[i]
                 testing.assert_allclose(d_test[ex.features].to_numpy(), d_ref)
 
+class TestSamplePlot(TestCase):
+    """Test plotting of samples in component space."""
+    example_data = [f"examples/exampledata{i+1}.csv" for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample="Sample")) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample="Sample", condition="Condition")) )
+
+    def test_default_call(self):
+        """
+        pod.POD.plot_samples(): test default call.
+        """
+        for ex in self.examples:
+            fig, ax = ex.plot_samples()
+            # testing with keyword argument
+            fig, ax = ex.plot_samples(marker='o')
+
+    def test_with_labels(self):
+        """
+        pod.POD.plot_samples(): test with labels.
+        """
+        for ex in self.examples:
+            fig, ax = ex.plot_samples(labels='condition')
+            fig, ax = ex.plot_samples(labels='time')
+            fig, ax = ex.plot_samples(labels='both')
+            with self.assertRaises(ValueError):
+                ex.plot_samples(labels='')
+
+    def test_with_annotation(self):
+        """
+        pod.POD.plot_samples(): test with labels.
+        """
+        for ex in self.examples:
+            fig, ax = ex.plot_samples(annotate=True)
+
+            
 class TestSampleWeightPlot(TestCase):
     """Test plotting of sample weights."""
     example_data = [f"examples/exampledata{i+1}.csv" for i in range(3)]
