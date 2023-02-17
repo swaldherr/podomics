@@ -433,13 +433,48 @@ Example usage
             return fig, ax
 
 
-    def plot_sample_weights(self, axs=None, components=[0], conditions=None, interpolate=False, labels=False, plotstyle={'marker':'.', 'linestyle':''}, interp_style={}, **kwargs):
+    def plot_sample_weights(self, axs=None, components=[0], conditions=None, annotate=False, interpolate=False, interp_style={}, **kwargs):
         """Plot timecourse of sample weights.
+
+A new figure is created by default.
+To plot into an existing figure, pass a list of Axes in the `axs` argument.
+Optionally an interpolation is added to the plot, using the `POD.interpolate_sample_weights()` method.
+If multiple conditions are given, the plot elements are labelled with the condition identifier,
+and if a new figure is created, a legend is shown.
+
+Parameters
+---
+axs : list of matplotlib `Axes`, default=None
+    Axes to plot into, must be one element for each component to be plotted.
+components : list of int, default=[0]
+    Indices of the components for which to plot time courses.
+conditions : list of str, default=None
+    Conditions to include in the plot (default: all)
+interpolate : str, default=False
+    Interpolation method to use, see `POD.interpolate_sample_weights()` for options.
+annotate : Boolean or list of str, default=False
+    Annotate data points with sample IDs. If `True`, annotate all samples, otherwise only the samples for which the IDs are given in the list.
+interp_style : dict, default={}
+    Arguments to pass to the `plot` method when plotting the interpolated time course. 
+    Default is a simple line in the same color as the data points for this condition.
+    Note that if you pass any arguments here, the color is not adjusted to the same as the data points!
+**kwargs : additional arguments
+    These are passed to the `plot` function when plotting the data points.
+    Default is to use the `'.'` plotstyle.
+
+Returns
+---
+Matplotlib figure and list of axes if these are newly created, otherwise nothing.
 
 Example usage
 ---
     >>> pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
-    >>> fig, ax = pod_result.plot_sample_weights(labels=True)
+    >>> fig, ax = pod_result.plot_sample_weights(annotate=True)
+
+To plot a single condition in a previously created Axes:
+    >>> from matplotlib import pyplot
+    >>> fig, axs = pyplot.subplots(1, 2)
+    >>> pod_result.plot_sample_weights(axs=axs, components=[0, 1], conditions=['a'], interpolate='average')
 """
         if axs is None:
             fig, axs = pyplot.subplots(1, len(components))
@@ -464,22 +499,41 @@ Example usage
         if interpolate is not False:
             method = interpolate if type(interpolate)==str else 'average'
             interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+        have_label = set()
         for comp, ax in zip(components, axs):
             if conditions is not None:
                 for cond in conditions:
-                    ax.plot(weights[weights[self.ds.condition]==cond][self.ds.time], weights[weights[self.ds.condition]==cond][comp], label=cond, **plotstyle)
+                    label = cond if cond not in have_label else None
+                    if len(kwargs) > 0:
+                        plot, = ax.plot(weights[weights[self.ds.condition]==cond][self.ds.time], weights[weights[self.ds.condition]==cond][comp], label=label, **kwargs)
+                    else:
+                        plot, = ax.plot(weights[weights[self.ds.condition]==cond][self.ds.time], weights[weights[self.ds.condition]==cond][comp], '.', label=label)
                     if interpolate is not False:
+                        label = f"{cond} (interp.)" if cond not in have_label else None
                         cond_weights = interp_weights[interp_weights[self.ds.condition]==cond]
-                        ax.plot(cond_weights.index, cond_weights[comp], label=f"{cond} (interp.)", **interp_style)
-                ax.legend()
+                        if len(interp_style) > 0:
+                            ax.plot(cond_weights.index, cond_weights[comp], label=label, **interp_style)
+                        else:
+                            ax.plot(cond_weights.index, cond_weights[comp], label=label, color=plot.get_color())
+                    have_label.add(cond)
             else:
-                ax.plot(weights[self.ds.time], weights[comp], **plotstyle)
+                if len(kwargs) > 0:
+                    plot, = ax.plot(weights[self.ds.time], weights[comp], **kwargs)
+                else:
+                    plot, = ax.plot(weights[self.ds.time], weights[comp], '.')
                 if interpolate is not False:
-                    ax.plot(interp_weights.index, interp_weights[comp], **interp_style)
-            if labels:
-                for i, l in enumerate(weights.index):
+                    if len(interp_style) > 0:
+                        ax.plot(interp_weights.index, interp_weights[comp], **interp_style)
+                    else:
+                        ax.plot(interp_weights.index, interp_weights[comp], color=plot.get_color())
+            if annotate is not False:
+                if annotate is True:
+                    annotate = weights.index
+                for l in annotate:
+                    i = weights.index.get_loc(l)
                     ax.annotate( l, (weights[self.ds.time][i], weights[comp][i]) )
         if new_fig:
+            fig.legend()
             return fig, axs
 
         
