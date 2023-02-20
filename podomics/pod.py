@@ -302,7 +302,7 @@ labels : str, default=None
 Example usage
 ---
     >>> pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
-    >>> fig, ax = pod_result.plot_features(annotate=True)
+    >>> fig, ax = pod_result.plot_features(labels='clusters', annotate=['0', '49'])
 """
         if ax is None:
             fig, ax = pyplot.subplots(1, 1)
@@ -318,15 +318,20 @@ Example usage
             feature_index = np.array([self.features.index(f) for f in features])
         if self.cluster is not None:
             for l in set(self.labels):
-                x = self.feature_weights[feature_index[self.labels==l], components[0]]
-                y = self.feature_weights[feature_index[self.labels==l], components[1]]
-                label = f"Cluster {l}" if labels=='cluster' else None
-                if len(kwargs):
-                    ax.plot(x, y, label=label, **kwargs)
-                else:
-                    ax.plot(x, y, '.', label=label)
+                fi = [i for i in feature_index if self.labels[i] == l]
+                if len(fi) > 0:
+                    x = self.feature_weights[fi, components[0]]
+                    y = self.feature_weights[fi, components[1]]
+                    label = f"Cluster {l}" if labels=='clusters' else None
+                    if len(kwargs):
+                        ax.plot(x, y, label=label, **kwargs)
+                    else:
+                        ax.plot(x, y, '.', label=label)
         else:
-            ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], '.')
+            if len(kwargs):
+                ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], **kwargs)
+            else:
+                ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], '.')
         if annotate is not False:
             if annotate is True:
                 annotate = features
@@ -334,6 +339,8 @@ Example usage
                 fi = self.features.index(f)
                 ax.annotate(f, ((self.feature_weights[fi, components[0]], self.feature_weights[fi, components[1]])))
         if new_fig:
+            if labels is not None:
+                ax.legend()
             return fig, ax
                     
     def plot_samples(self, ax=None, components=(0, 1), samples=None, annotate=False, labels=None, **kwargs):

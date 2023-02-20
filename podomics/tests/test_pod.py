@@ -133,6 +133,43 @@ class TestComputeComponent(TestCase):
                 d_ref = np.atleast_2d(U[:,i]).T.dot(np.atleast_2d(Vt[i,:])) * S[i]
                 testing.assert_allclose(d_test[ex.features].to_numpy(), d_ref)
 
+class TestFeaturePlot(TestCase):
+    """Test plotting of features in component space."""
+    example_data = [f"examples/exampledata{i+1}.csv" for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample="Sample"), cluster=cluster.KMeans(n_clusters=3, n_init='auto'), cluster_components=4) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample="Sample", condition="Condition"), cluster=cluster.KMeans(n_clusters=3, n_init='auto'), cluster_components=4) )
+
+    def test_default_call(self):
+        """
+        pod.POD.plot_features(): test default call.
+        """
+        for ex in self.examples:
+            fig, ax = ex.plot_features()
+            # testing with keyword argument
+            fig, ax = ex.plot_features(marker='o')
+
+    def test_with_labels(self):
+        """
+        pod.POD.plot_features(): test with labels.
+        """
+        for ex in self.examples:
+            fig, ax = ex.plot_features(labels='clusters')
+
+    def test_with_annotation(self):
+        """
+        pod.POD.plot_features(): test with labels.
+        """
+        for ex in self.examples:
+            fig, ax = ex.plot_features(annotate=True)
+
+    def test_feature_subset(self):
+        """
+        pod.POD.plot_features(): test plotting feature subset.        
+        """
+        for ex in self.examples:
+            fig, ax = ex.plot_features(labels='clusters', features=['0', '49'])
+        
+            
 class TestSamplePlot(TestCase):
     """Test plotting of samples in component space."""
     example_data = [f"examples/exampledata{i+1}.csv" for i in range(3)]
