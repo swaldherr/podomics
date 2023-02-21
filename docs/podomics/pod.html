@@ -1,0 +1,2502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.8.1" />
+<title>podomics.pod API documentation</title>
+<meta name="description" content="Perform proper orthogonal decomposition for omics timeseries data." />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>podomics.pod</code></h1>
+</header>
+<section id="section-intro">
+<p>Perform proper orthogonal decomposition for omics timeseries data.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;Perform proper orthogonal decomposition for omics timeseries data.&#34;&#34;&#34;
+
+import numpy as np
+from scipy import linalg
+import pandas
+import matplotlib
+from matplotlib import pyplot
+
+from . import dataset
+from .dataset import Dataset
+
+class POD(object):
+    &#34;&#34;&#34;POD computations and evaluation of results.
+&#34;&#34;&#34;
+    def __init__(self, ds, features=None, conditions=None, cluster=None, cluster_components=1, **kwargs):
+        &#34;&#34;&#34;The constructor runs a POD on a given dataset.
+
+Parameters
+---
+ds : Dataset
+    `Dataset` object on which to do the POD computation.
+features : list of str, default=None
+    Features to include in the analysis, default all.
+conditions : list of str, default=None
+    Conditions to include in the analysis, default all.
+cluster : object, default=None
+    Pass an instance of one of the classes in [sklearn.cluster](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.cluster) to perform
+    clustering on the features.
+    Clustering will be done in the singular vector (principal component) space.
+cluster_components : int, default=1
+    Dimensions of the singular vector space to use for clustering. For example, if `cluster_components=2`, clustering will be done based
+    on the first two singular vectors (principal components).
+
+Attributes
+---
+ds : Dataset
+    Internal `Dataset` object containing only the conditions / features that were used in the POD.
+features : list of str
+    Features used in the POD. Can be a subset of the features in the original dataset.
+condition_list : list of str or None
+    List of conditions used in the POD. Can be a subset of the conditions in the original dataset.
+sing_values : array
+    One-dimensional array of singular values resulting from the POD. 
+    The length of the array is either the number of considered features or the number of considered samples, depending on what is smaller.
+sample_weights : DataFrame
+    Pandas dataframe of sample weights in the POD.
+    The array shape is equal to the number of considered samples by the number of singular values.
+    This is equal to the left singular vectors of the considered data matrix.
+feature_weights : array
+    Two-dimensional array of feature weights in the POD.
+    The array shape is equal to the number of considered features by the number of singular values.
+    This is equal to the right singular vectors of the considered data matrix.    
+cluster : object
+    Instance of the sklearn class which was used for clustering.
+cluster_components : int, default=1
+    Number of singular vectors / principal components, in decreasing order of weight, on which to do the clustering.
+
+Example usage
+---
+#### Load a dataset to run POD on
+
+    &gt;&gt;&gt; omics = dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;)
+
+#### Run POD on the dataset
+
+To run POD on the full dataset, create a new `POD` object with the dataset as argument:
+
+    &gt;&gt;&gt; pod_result = POD(omics)
+
+To use only a subset of the data, create the `POD` object with the appropriate lists in the `features` and/or `conditions` keyword arguments:
+
+    &gt;&gt;&gt; pod_result = POD(omics, conditions=[&#39;a&#39;])
+
+Clustering can be performed directly when running the analysis. Recommended clustering methods are [`KMeans`](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html) and [`GaussianMixture`](https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html) from the [`sklearn`](https://scikit-learn.org) package.
+
+    &gt;&gt;&gt; from sklearn.cluster import KMeans
+    &gt;&gt;&gt; pod_result = POD(omics, cluster=KMeans(n_clusters=3, n_init=&#39;auto&#39;), cluster_components=4)
+
+    &gt;&gt;&gt; from sklearn.mixture import GaussianMixture
+    &gt;&gt;&gt; pod_result = POD(omics, cluster=GaussianMixture(n_components=3), cluster_components=4)
+&#34;&#34;&#34;
+        if features is None:
+            self.features = ds.features
+        else:
+            for f in features:
+                if f not in ds.features:
+                    raise ValueError(f&#39;Feature &#34;{f}&#34; not found in dataset features: {ds.features}&#39;)
+                self.features = features
+        if conditions is None:
+            self.condition_list = ds.condition_list
+            df = ds.data
+        else:
+            for c in conditions:
+                if c not in ds.condition_list:
+                    raise ValueError(f&#39;Condition &#34;{c}&#34; not found in dataset condition list: {ds.condition_list}&#39;)
+            self.condition_list = conditions
+            df = ds.data[ds.data[ds.condition].isin(conditions)]
+
+        self.ds = Dataset(df, time=ds.time, condition=ds.condition, features=self.features)
+        U, self.sing_values, Vt = linalg.svd(np.asarray(self.ds.data[self.features]))
+        self.feature_weights = Vt.T
+        self.sample_weights = pandas.DataFrame(U, index=df.index)
+        self.sample_weights.insert(0, self.ds.time, self.ds.data[self.ds.time])
+        if self.ds.condition is not None:
+            self.sample_weights.insert(0, self.ds.condition, self.ds.data[self.ds.condition])
+
+        self.cluster = cluster
+        if self.cluster is not None:
+            self.labels = self.cluster.fit_predict(self.feature_weights[:, :cluster_components])
+
+    def interpolate_sample_weights(self, interpolation=&#39;average&#39;, conditions=None, timepoints=None):
+        &#34;&#34;&#34;Compute interpolated sample weights.
+
+Used to approximate a timecourse of component weights for the given conditions.
+Depending on the interpolation method, for each condition, a time course of weights for each component is computed based on the weights of
+individual samples from that condition.
+
+Parameters
+---
+interpolation : str
+    * &#39;average&#39;: average samples from the same time point, no interpolation among different time points
+    Currently only this method is implemented.
+conditions : list of str, default=None
+    List of conditions to retain, default all.
+timepoints : list of timepoint labels / array, default=None
+    List of timepoints for which to compute interpolated weights, 
+    default is the list of timepoints in the dataset.
+    With `interpolation=&#39;average&#39;`, the timepoints given here must also be contained in the dataset!
+
+Returns
+---
+Dataframe with timepoints as index, and interpolated component weights as columns.
+If a condition column is used, the result also contains that column information.
+Columns labelled with integers from 0 correspond to interpolated weights for the components in order of decreasing singular values.
+
+**Note:** If multiple conditions are in the dataset, the timepoint index in the result may not be unique!
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; average_weights = pod_result.interpolate_sample_weights()
+    &gt;&gt;&gt; average_weights.iloc[:2,:3]
+                      0         1         2
+    Timepoint                              
+    0.00      -0.307343 -0.320584  0.245403
+    0.25      -0.279958 -0.144988 -0.251014
+&#34;&#34;&#34;
+        conditions = self._check_conditions(conditions)
+        if timepoints is None:
+            timepoints = self.ds.timepoints
+        if self.ds.condition is None:
+            df = self.sample_weights
+        else:
+            df = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
+        if interpolation == &#39;average&#39;:
+            df = df[df[self.ds.time].isin(timepoints)]
+            if self.ds.condition is not None:
+                res = [df[df[self.ds.condition]==c].groupby(self.ds.time).mean(numeric_only=True) for c in conditions]
+                for i,c in enumerate(conditions):
+                    res[i].insert(0, self.ds.condition, c)
+                return pandas.concat(res)
+            else:
+                return df.groupby(self.ds.time).mean()
+        else:
+            raise ValueError(f&#34;&#34;&#34;Only &#34;interpolation=&#39;average&#39;&#34; is currently implemented, not &#34;{interpolation}&#34;.&#34;&#34;&#34;)
+
+    def get_component(self, component=0):
+        &#34;&#34;&#34;Compute reconstructed data for a single component.
+
+This function computes the data reconstruction for a single component.
+The result is returned in a
+
+Parameters
+---
+component : int, default=0
+    Index of the component for which to do the reconstruction.
+
+Returns
+---
+DataFrame : 
+    Pandas `DataFrame` with the same structure as the dataset that the POD was computed for.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; df = pod_result.get_component(0)
+    &gt;&gt;&gt; df.iloc[:3, :4]
+            Timepoint         0         1         2
+    Sample                                         
+    T0R0          0.0  0.803708  0.746042  0.753983
+    T0R1          0.0  0.791919  0.735099  0.742923
+    T0R2          0.0  0.811034  0.752842  0.760856
+&#34;&#34;&#34;
+        Ui = np.atleast_2d(self.sample_weights[component].to_numpy())
+        Vi = np.atleast_2d(self.feature_weights[:,component])
+        data = Ui.T.dot(Vi) * self.sing_values[component]
+        df = pandas.DataFrame(data, columns=self.features, index=self.ds.data.index)
+        df.insert(0, self.ds.time, self.ds.data[self.ds.time])
+        if self.ds.condition is not None:
+            df.insert(0, self.ds.condition, self.ds.data[self.ds.condition])
+        return df
+
+
+    def plot_singular_values(self, ax=None, trafo=None, fit_line=False, line_plot_args={}, **kwargs):
+        &#34;&#34;&#34;Plot the singular values.
+
+Singular values are plotted in decreasing order in a new axes, or in one passed as argument to the function.
+By default the plotstyle is &#39;--.&#39;, but it can be changed with keyword arguments.
+Optionally, a line can be fitted to (part of) the singular values, to indicate which ones are larger than one would expect from random data.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    Axes to plot into, will be created if None.
+trafo : callable, default=None
+    Transformation to apply to the values before plotting, for example logarithm.
+    The function needs to be vectorized (e.g., use numpy.log, not math.log).
+fit_line : Boolean, float &lt; 1, or int &gt;= 1, default=False
+    Fit a line to (part of) the (transformed) values and show it in the plot.
+    With `fit_line=True`, a line is fitted to all values.
+    If `fit_line` is an integer &gt;= 1, fit the line to that number of smallest values.
+    If it is a float &lt; 1, fit the line to that fraction of smallest values.
+line_plot_args : dictionary, default={}
+    Dictionary of keyword arguments to pass to the plotting of the fitted line
+**kwargs : 
+    Arguments to be passed to the [`plot`](https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html) method when plotting the singular values.
+
+Returns
+---
+If a new figure is created (`ax=None`), then the resulting Figure and Axes object are returned.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_singular_values(fit_line=0.7)
+&#34;&#34;&#34;
+        if ax is None:
+            fig, ax = pyplot.subplots(1, 1)
+            if trafo is None:
+                ax.set_ylabel(&#34;Singular values&#34;)
+            else:
+                ax.set_ylabel(str(trafo) + &#34; singular values&#34;)
+            ax.set_xlabel(&#34;Component index&#34;)
+            new_fig = True
+        else:
+            new_fig = False
+        if trafo is None:
+            values = self.sing_values
+        else:
+            values = trafo(self.sing_values)
+        ax.plot(values, &#39;--.&#39;, **kwargs)
+        if fit_line is not False:
+            if fit_line is True:
+                M = np.ones(shape=(self.sing_values.shape[0], 2))
+                M[:,1] = np.arange(self.sing_values.shape[0])
+                fit_vals = values
+            elif fit_line &lt; 1:
+                num_fit = max(2, int(np.round(fit_line * self.sing_values.shape[0])))
+                M = np.ones(shape=(num_fit, 2))
+                M[:,1] = np.arange(self.sing_values.shape[0]-num_fit, self.sing_values.shape[0])
+                fit_vals = values[-num_fit:]
+            else:
+                M = np.ones(shape=(fit_line, 2))
+                M[:,1] = np.arange(self.sing_values.shape[0]-fit_line, self.sing_values.shape[0])
+                fit_vals = values[-fit_line:]
+            fit_param = linalg.lstsq(M, fit_vals)[0]
+            M_full = np.ones(shape=(self.sing_values.shape[0], 2))
+            M_full[:,1] = np.arange(self.sing_values.shape[0])
+            ax.plot(M_full[:,1], M_full.dot(fit_param), **line_plot_args)
+        if new_fig:
+            return fig, ax
+
+    def plot_features(self, ax=None, components=(0, 1), features=None, annotate=False, labels=None, **kwargs):
+        &#34;&#34;&#34;Component weight plot of the features.
+
+Plots the weights of features in two components as a scatter plot.
+Each data point in the plot corresponds to one feature, where the x-value is the weight of this feature in the first indicated component,
+and the y-value is the weight of this feature in the second indicated component.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    Axes to plot into, if `None` a new axis is created.
+components : tuple of two int values, default=(0, 1)
+    Components to consider for plotting.
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+features : list of str, default=None
+    List of features to include in the plot. If `None`, plot all features.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib `annotate` method.
+    To label only selected features, pass the identifiers of the desired features as list.
+labels : str, default=None
+    Which labels to assign for a possible plot legend.
+    By default, no labels are assigned.
+    With `labels=&#39;clusters&#39;`, labels according to the cluster numbers are assigned.
+    If this argument is not `None` and a new figure is created, also shows the legend.
+    If plotting in a given Axes, the legend has to be activated separately.
+**kwargs : 
+    Additional arguments are passed to matplotlib&#39;s `plot` function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle `&#39;.&#39;` is used.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_features(labels=&#39;clusters&#39;, annotate=[&#39;0&#39;, &#39;49&#39;])
+&#34;&#34;&#34;
+        if ax is None:
+            fig, ax = pyplot.subplots(1, 1)
+            ax.set_xlabel(f&#34;Component {components[0]}&#34;)
+            ax.set_ylabel(f&#34;Component {components[1]}&#34;)
+            new_fig = True
+        else:
+            new_fig = False
+        if features is None:
+            features = self.features
+            feature_index = np.array(range(len(self.features)))
+        else:
+            feature_index = np.array([self.features.index(f) for f in features])
+        if self.cluster is not None:
+            for l in set(self.labels):
+                fi = [i for i in feature_index if self.labels[i] == l]
+                if len(fi) &gt; 0:
+                    x = self.feature_weights[fi, components[0]]
+                    y = self.feature_weights[fi, components[1]]
+                    label = f&#34;Cluster {l}&#34; if labels==&#39;clusters&#39; else None
+                    if len(kwargs):
+                        ax.plot(x, y, label=label, **kwargs)
+                    else:
+                        ax.plot(x, y, &#39;.&#39;, label=label)
+        else:
+            if len(kwargs):
+                ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], **kwargs)
+            else:
+                ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], &#39;.&#39;)
+        if annotate is not False:
+            if annotate is True:
+                annotate = features
+            for f in annotate:
+                fi = self.features.index(f)
+                ax.annotate(f, ((self.feature_weights[fi, components[0]], self.feature_weights[fi, components[1]])))
+        if new_fig:
+            if labels is not None:
+                ax.legend()
+            return fig, ax
+                    
+    def plot_samples(self, ax=None, components=(0, 1), samples=None, annotate=False, labels=None, **kwargs):
+        &#34;&#34;&#34;Component weight plot of the samples.
+
+Plots the weights of samples in two components as a scatter plot.
+Each data point in the plot corresponds to one sample, where the x-value is the weight of this sample in the first indicated component,
+and the y-value is the weight of this sample in the second indicated component.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    Axes to plot into, if `None` a new axis is created.
+components : tuple of two int values, default=(0, 1)
+    Components to consider for plotting.
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+samples : list of str, default=None
+    List of samples (by IDs) to include in the plot. If `None`, plot all samples.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the sample IDs, using the matplotlib `annotate` method.
+    To label only selected samples, pass the IDs of the desired samples as list.
+labels : str, default=None
+    Can be used to either label conditions or timepoints for a plot legend.
+    Options are:
+    - `&#39;condition&#39;` : use condition names as labels.
+    - `&#39;time`&#39; : use timepoint identifiers as labels.
+    - `&#39;both`&#39; : include both condition and timepoint identifiers in the labels (only recommended with few samples / many replicates)
+    When using that option, different conditions / timepoints are plotted with different colors, unless a custom plotstyle is used.
+**kwargs : 
+    Additional arguments are passed to matplotlib&#39;s `plot` function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle `&#39;.&#39;` is used.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_samples(annotate=True, labels=&#39;condition&#39;)
+&#34;&#34;&#34;
+        if ax is None:
+            fig, ax = pyplot.subplots(1, 1)
+            ax.set_xlabel(f&#34;Component {components[0]}&#34;)
+            ax.set_ylabel(f&#34;Component {components[1]}&#34;)
+            new_fig = True
+        else:
+            new_fig = False
+        if samples is None:
+            samples = [s for s in self.ds.data.index]
+            sample_index = np.array(range(len(samples)))
+        else:
+            sample_index = np.array([samples.index(s) for s in samples])
+        data = self.sample_weights.iloc[sample_index, :]
+        have_plot = False
+        if labels is not None:
+            if labels == &#39;condition&#39;:
+                if self.ds.condition is not None:
+                    for c in self.ds.condition_list:
+                        plotsamples = data[data[self.ds.condition] == c]
+                        if len(kwargs) &gt; 0:
+                            ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f&#34;{self.ds.condition} {c}&#34;, **kwargs)
+                        else:
+                            ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], &#39;.&#39;, label=f&#34;{self.ds.condition} {c}&#34;)
+                    have_plot = True
+            elif labels == &#39;time&#39;:
+                for t in self.ds.timepoints:
+                    plotsamples = data[data[self.ds.time] == t]
+                    if len(kwargs) &gt; 0:
+                        ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f&#34;{self.ds.time} {t}&#34;, **kwargs)
+                    else:
+                        ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], &#39;.&#39;, label=f&#34;{self.ds.time} {t}&#34;)
+                have_plot = True
+            elif labels == &#39;both&#39;:
+                if self.ds.condition is None:
+                    self.plot_samples(ax=ax, components=components, samples=samples, labels=&#39;time&#39;, annotate=annotate, **kwargs)
+                else:
+                    for c in self.ds.condition_list:
+                        for t in self.ds.timepoints:
+                            plotsamples = data[(data[self.ds.condition] == c) &amp; (data[self.ds.time] == t)]
+                            if len(kwargs) &gt; 0:
+                                ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f&#34;{c} @ {t}&#34;, **kwargs)
+                            else:
+                                ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], &#39;.&#39;, label=f&#34;{c} @ {t}&#34;)
+                have_plot = True
+            else:
+                raise ValueError(f&#34;Option &#39;{labels}&#39; is not available for the &#39;labels&#39; keyword argument.&#34;)
+            if new_fig and have_plot:
+                ax.legend()
+        if not have_plot:
+            if len(kwargs) &gt; 0:
+                ax.plot(data[(components[0])], data[(components[1])], **kwargs)
+            else:
+                ax.plot(data[(components[0])], data[(components[1])], &#39;.&#39;)
+        if annotate is not False:
+            if annotate is True:
+                annotate = samples
+            for s in annotate:
+                ax.annotate(s, ((data.loc[s, (components[0])], data.loc[s, (components[1])])))
+        if new_fig:
+            return fig, ax
+
+
+    def plot_sample_weights(self, axs=None, components=[0], conditions=None, annotate=False, interpolate=False, interp_style={}, **kwargs):
+        &#34;&#34;&#34;Plot timecourse of sample weights.
+
+A new figure is created by default.
+To plot into an existing figure, pass a list of Axes in the `axs` argument.
+Optionally an interpolation is added to the plot, using the `POD.interpolate_sample_weights()` method.
+If multiple conditions are given, the plot elements are labelled with the condition identifier,
+and if a new figure is created, a legend is shown.
+
+Parameters
+---
+axs : list of matplotlib `Axes`, default=None
+    Axes to plot into, must be one element for each component to be plotted.
+components : list of int, default=[0]
+    Indices of the components for which to plot time courses.
+conditions : list of str, default=None
+    Conditions to include in the plot (default: all)
+interpolate : str, default=False
+    Interpolation method to use, see `POD.interpolate_sample_weights()` for options.
+annotate : Boolean or list of str, default=False
+    Annotate data points with sample IDs. If `True`, annotate all samples, otherwise only the samples for which the IDs are given in the list.
+interp_style : dict, default={}
+    Arguments to pass to the `plot` method when plotting the interpolated time course. 
+    Default is a simple line in the same color as the data points for this condition.
+    Note that if you pass any arguments here, the color is not adjusted to the same as the data points!
+**kwargs : additional arguments
+    These are passed to the `plot` function when plotting the data points.
+    Default is to use the `&#39;.&#39;` plotstyle.
+
+Returns
+---
+Matplotlib figure and list of axes if these are newly created, otherwise nothing.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_sample_weights(annotate=True)
+
+To plot a single condition in a previously created Axes:
+    &gt;&gt;&gt; from matplotlib import pyplot
+    &gt;&gt;&gt; fig, axs = pyplot.subplots(1, 2)
+    &gt;&gt;&gt; pod_result.plot_sample_weights(axs=axs, components=[0, 1], conditions=[&#39;a&#39;], interpolate=&#39;average&#39;)
+&#34;&#34;&#34;
+        if axs is None:
+            fig, axs = pyplot.subplots(1, len(components))
+            new_fig = True
+            if len(components) == 1:
+                axs = [axs]
+            for ax,c in zip(axs, components):
+                ax.set_xlabel(self.ds.time)
+                ax.set_title(f&#34;Component #{c}&#34;)
+            axs[0].set_ylabel(&#34;Weight&#34;)
+        else:
+            if len(components) == 1:
+                axs = [axs]
+            new_fig = False
+        if len(components) != len(axs):
+            raise ValueError(f&#34;List `components` must have same length as `axs`, got {len(components)} vs {len(axs)}.&#34;)
+        conditions = self._check_conditions(conditions)
+        if conditions is not None:
+            weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
+        else:
+            weights = self.sample_weights
+        if interpolate is not False:
+            method = interpolate if type(interpolate)==str else &#39;average&#39;
+            interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+        have_label = set()
+        for comp, ax in zip(components, axs):
+            if conditions is not None:
+                for cond in conditions:
+                    label = cond if cond not in have_label else None
+                    if len(kwargs) &gt; 0:
+                        plot, = ax.plot(weights[weights[self.ds.condition]==cond][self.ds.time], weights[weights[self.ds.condition]==cond][comp], label=label, **kwargs)
+                    else:
+                        plot, = ax.plot(weights[weights[self.ds.condition]==cond][self.ds.time], weights[weights[self.ds.condition]==cond][comp], &#39;.&#39;, label=label)
+                    if interpolate is not False:
+                        label = f&#34;{cond} (interp.)&#34; if cond not in have_label else None
+                        cond_weights = interp_weights[interp_weights[self.ds.condition]==cond]
+                        if len(interp_style) &gt; 0:
+                            ax.plot(cond_weights.index, cond_weights[comp], label=label, **interp_style)
+                        else:
+                            ax.plot(cond_weights.index, cond_weights[comp], label=label, color=plot.get_color())
+                    have_label.add(cond)
+            else:
+                if len(kwargs) &gt; 0:
+                    plot, = ax.plot(weights[self.ds.time], weights[comp], **kwargs)
+                else:
+                    plot, = ax.plot(weights[self.ds.time], weights[comp], &#39;.&#39;)
+                if interpolate is not False:
+                    if len(interp_style) &gt; 0:
+                        ax.plot(interp_weights.index, interp_weights[comp], **interp_style)
+                    else:
+                        ax.plot(interp_weights.index, interp_weights[comp], color=plot.get_color())
+            if annotate is not False:
+                if annotate is True:
+                    annotate = weights.index
+                for l in annotate:
+                    i = weights.index.get_loc(l)
+                    ax.annotate( l, (weights[self.ds.time][i], weights[comp][i]) )
+        if new_fig:
+            fig.legend()
+            return fig, axs
+
+        
+    def plot_data_reconstruction(self, ax=None):
+        &#34;&#34;&#34;Plot data reconstruction
+        &#34;&#34;&#34;
+
+    def plot_feature_trajectories(self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=False, clusters=None, labels=False, **kwargs):
+        &#34;&#34;&#34;Plot trajectories of individual features in component space.
+
+Parameters
+---
+conditions : list of str, default=None
+    List of conditions to plot.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_feature_trajectories()
+        &#34;&#34;&#34;
+        conditions = self._check_conditions(conditions)
+        if ax is None:
+            if conditions is not None:
+                fig, axs = pyplot.subplots(1, len(conditions))
+            else:
+                fig, ax = pyplot.subplots(1, 1)
+                axs = [ax,]
+            for i, ax in enumerate(axs):
+                ax.set_xlabel(f&#34;Component #{components[0]}&#34;)
+                if conditions is not None:
+                    ax.set_title(f&#34;{self.ds.condition} {conditions[i]}&#34;)
+            axs[0].set_ylabel(f&#34;Component #{components[1]}&#34;)
+            new_fig = True
+        else:
+            axs = [ax,]
+            new_fig = False
+
+        if features is None:
+            features = self.features
+            feature_index = np.array(range(len(self.features)))
+        else:
+            feature_index = np.array([self.features.index(f) for f in features])
+
+        if conditions is not None:
+            weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
+        else:
+            weights = self.sample_weights
+        if interpolate is not False:
+            method = interpolate if isinstance(interpolate, str) else &#39;average&#39;
+            interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+
+        for f, fi in zip(features, feature_index):
+            if conditions is not None:
+                for i,c in enumerate(conditions):
+                    traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
+                    traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
+            else:
+                traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
+                traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
+                axs[0].plot(traj0, traj1, &#39;.&#39;, **kwargs)
+
+        # if False: #self.cluster is not None:
+        #     for l in set(self.labels):
+        #         ax.plot(self.feature_weights[feature_index[self.labels==l], components[0]], self.feature_weights[feature_index[self.labels==l], components[1]], &#39;.&#39;)
+        # else:
+        #     ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], &#39;.&#39;)
+        if new_fig:
+            return fig, ax
+        
+    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+        &#34;&#34;&#34;Plot feature trajectories within the component space to given Axes.
+
+This method can only be used to plot raw data points for a single condition into a provided matplotlib Axes.
+Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
+
+See also
+---
+Other methods to plot interpolated trajectory / plot multiple conditions
+
+Parameters
+---
+ax : Matplotlib Axes
+    Axes to plot into.
+components : tuple of int, default=(0,1)
+    Components to consider for plotting. 
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+features : list of str, default=None
+    List of features to include in the plot.
+    If `None`, plot all features.
+condition : str, default=None
+    Identifier of the condition to plot.
+    By default the first of the known conditions is plotted.
+clusters : list of int, default=None
+    List of cluster identifiers to include in the plot, default is all clusters.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib annotate method.
+    To label only selected features, pass the identifiers of the desired features as list.
+labels : str, default=None
+    Which labels to assign for a possible plot legend. By default, no labels are assigned.
+    With `labels=&#39;clusters&#39;`, labels according to the cluster numbers are assigned.
+    With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
+    If plotting in a given Axes, the legend has to be activated separately.
+**kwargs : dict
+    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle &#39;.&#39; is used.
+
+Example usage
+---
+    &gt;&gt;&gt; from matplotlib import pyplot
+    &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; pod_result.plot_feature_trajectory_in(ax, annotate=True)
+&#34;&#34;&#34;
+        conditions = self._check_conditions(condition)
+        condition = conditions[0] if conditions is not None else None
+        df0 = self.get_component(components[0])
+        df1 = self.get_component(components[1])
+        if condition is not None and self.ds.condition is not None:
+            df0 = df0[df0[self.ds.condition] == condition]
+            df1 = df1[df1[self.ds.condition] == condition]
+        if features is None:
+            fs = self.features
+        else:
+            fs = features
+        # features = np.asarray(features)
+        if clusters is None and self.cluster is not None:
+            clusters = list(set(self.labels))
+        if clusters is not None and self.cluster is not None:
+            fc = [(f,l) for f,l in zip(self.features, self.labels) if f in fs and l in clusters]
+            features = [f for f,l in fc]
+            clusters = [l for f,l in fc]
+        else:
+            features = fs
+        labelled = dict()
+        for i,f in enumerate(features):
+            label = None
+            color = None
+            if condition is not None and labels == &#39;condition&#39;:
+                if condition not in labelled:
+                    label = f&#34;{self.ds.condition} {condition}&#34;
+                    labelled[condition] = None
+                else:
+                    color = labelled[condition].get_color()
+            if self.cluster is not None and labels == &#39;cluster&#39;:
+                if clusters[i] not in labelled:
+                    label = f&#34;Cluster {clusters[i]}&#34;
+                    labelled[clusters[i]] = None
+                else:
+                    color = labelled[clusters[i]].get_color()
+            if len(kwargs):
+                plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
+            else:
+                plot, = ax.plot(df0[f], df1[f], &#39;.&#39;, label=label, color=color)
+            if label is not None:
+                if labels == &#39;condition&#39;:
+                    labelled[condition] = plot
+                if labels == &#39;cluster&#39;:
+                    labelled[clusters[i]] = plot
+        if annotate is not False:
+            if annotate is True:
+                annotate = features
+            for a in annotate:
+                ax.annotate(a, (df0[a][0], df1[a][0]) )
+
+
+    def _check_conditions(self, conditions):
+        &#34;&#34;&#34;Check that all conditions are valid.
+
+Returns
+---
+List of conditions to use.
+
+Raises
+---
+`ValueError` if `conditions` is not a valid selection of conditions.
+&#34;&#34;&#34;
+        if self.ds.condition is not None:
+            if conditions is None:
+                conditions = self.condition_list
+            else:
+                for c in conditions:
+                    if c not in self.ds.condition_list:
+                        raise ValueError(f&#39;Condition &#34;{c}&#34; not found in dataset condition list: {self.ds.condition_list}&#39;)
+        else:
+            conditions = None
+        return conditions</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="podomics.pod.POD"><code class="flex name class">
+<span>class <span class="ident">POD</span></span>
+<span>(</span><span>ds, features=None, conditions=None, cluster=None, cluster_components=1, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>POD computations and evaluation of results.</p>
+<p>The constructor runs a POD on a given dataset.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ds</code></strong> :&ensp;<code>Dataset</code></dt>
+<dd><code>Dataset</code> object on which to do the POD computation.</dd>
+<dt><strong><code>features</code></strong> :&ensp;<code>list</code> of <code>str</code>, default=<code>None</code></dt>
+<dd>Features to include in the analysis, default all.</dd>
+<dt><strong><code>conditions</code></strong> :&ensp;<code>list</code> of <code>str</code>, default=<code>None</code></dt>
+<dd>Conditions to include in the analysis, default all.</dd>
+<dt><strong><code>cluster</code></strong> :&ensp;<code>object</code>, default=<code>None</code></dt>
+<dd>Pass an instance of one of the classes in <a href="https://scikit-learn.org/stable/modules/classes.html#module-sklearn.cluster">sklearn.cluster</a> to perform
+clustering on the features.
+Clustering will be done in the singular vector (principal component) space.</dd>
+<dt><strong><code>cluster_components</code></strong> :&ensp;<code>int</code>, default=<code>1</code></dt>
+<dd>Dimensions of the singular vector space to use for clustering. For example, if <code>cluster_components=2</code>, clustering will be done based
+on the first two singular vectors (principal components).</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>ds</code></strong> :&ensp;<code>Dataset</code></dt>
+<dd>Internal <code>Dataset</code> object containing only the conditions / features that were used in the POD.</dd>
+<dt><strong><code>features</code></strong> :&ensp;<code>list</code> of <code>str</code></dt>
+<dd>Features used in the POD. Can be a subset of the features in the original dataset.</dd>
+<dt><strong><code>condition_list</code></strong> :&ensp;<code>list</code> of <code>str</code> or <code>None</code></dt>
+<dd>List of conditions used in the POD. Can be a subset of the conditions in the original dataset.</dd>
+<dt><strong><code>sing_values</code></strong> :&ensp;<code>array</code></dt>
+<dd>One-dimensional array of singular values resulting from the POD.
+The length of the array is either the number of considered features or the number of considered samples, depending on what is smaller.</dd>
+<dt><strong><code>sample_weights</code></strong> :&ensp;<code>DataFrame</code></dt>
+<dd>Pandas dataframe of sample weights in the POD.
+The array shape is equal to the number of considered samples by the number of singular values.
+This is equal to the left singular vectors of the considered data matrix.</dd>
+<dt><strong><code>feature_weights</code></strong> :&ensp;<code>array</code></dt>
+<dd>Two-dimensional array of feature weights in the POD.
+The array shape is equal to the number of considered features by the number of singular values.
+This is equal to the right singular vectors of the considered data matrix.</dd>
+<dt><strong><code>cluster</code></strong> :&ensp;<code>object</code></dt>
+<dd>Instance of the sklearn class which was used for clustering.</dd>
+<dt><strong><code>cluster_components</code></strong> :&ensp;<code>int</code>, default=<code>1</code></dt>
+<dd>Number of singular vectors / principal components, in decreasing order of weight, on which to do the clustering.</dd>
+</dl>
+<h2 id="example-usage">Example Usage</h2>
+<h4 id="load-a-dataset-to-run-pod-on">Load a dataset to run POD on</h4>
+<pre><code>&gt;&gt;&gt; omics = dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition")
+</code></pre>
+<h4 id="run-pod-on-the-dataset">Run POD on the dataset</h4>
+<p>To run POD on the full dataset, create a new <code><a title="podomics.pod.POD" href="#podomics.pod.POD">POD</a></code> object with the dataset as argument:</p>
+<pre><code>&gt;&gt;&gt; pod_result = POD(omics)
+</code></pre>
+<p>To use only a subset of the data, create the <code><a title="podomics.pod.POD" href="#podomics.pod.POD">POD</a></code> object with the appropriate lists in the <code>features</code> and/or <code>conditions</code> keyword arguments:</p>
+<pre><code>&gt;&gt;&gt; pod_result = POD(omics, conditions=['a'])
+</code></pre>
+<p>Clustering can be performed directly when running the analysis. Recommended clustering methods are <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html"><code>KMeans</code></a> and <a href="https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html"><code>GaussianMixture</code></a> from the <a href="https://scikit-learn.org"><code>sklearn</code></a> package.</p>
+<pre><code>&gt;&gt;&gt; from sklearn.cluster import KMeans
+&gt;&gt;&gt; pod_result = POD(omics, cluster=KMeans(n_clusters=3, n_init='auto'), cluster_components=4)
+
+&gt;&gt;&gt; from sklearn.mixture import GaussianMixture
+&gt;&gt;&gt; pod_result = POD(omics, cluster=GaussianMixture(n_components=3), cluster_components=4)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class POD(object):
+    &#34;&#34;&#34;POD computations and evaluation of results.
+&#34;&#34;&#34;
+    def __init__(self, ds, features=None, conditions=None, cluster=None, cluster_components=1, **kwargs):
+        &#34;&#34;&#34;The constructor runs a POD on a given dataset.
+
+Parameters
+---
+ds : Dataset
+    `Dataset` object on which to do the POD computation.
+features : list of str, default=None
+    Features to include in the analysis, default all.
+conditions : list of str, default=None
+    Conditions to include in the analysis, default all.
+cluster : object, default=None
+    Pass an instance of one of the classes in [sklearn.cluster](https://scikit-learn.org/stable/modules/classes.html#module-sklearn.cluster) to perform
+    clustering on the features.
+    Clustering will be done in the singular vector (principal component) space.
+cluster_components : int, default=1
+    Dimensions of the singular vector space to use for clustering. For example, if `cluster_components=2`, clustering will be done based
+    on the first two singular vectors (principal components).
+
+Attributes
+---
+ds : Dataset
+    Internal `Dataset` object containing only the conditions / features that were used in the POD.
+features : list of str
+    Features used in the POD. Can be a subset of the features in the original dataset.
+condition_list : list of str or None
+    List of conditions used in the POD. Can be a subset of the conditions in the original dataset.
+sing_values : array
+    One-dimensional array of singular values resulting from the POD. 
+    The length of the array is either the number of considered features or the number of considered samples, depending on what is smaller.
+sample_weights : DataFrame
+    Pandas dataframe of sample weights in the POD.
+    The array shape is equal to the number of considered samples by the number of singular values.
+    This is equal to the left singular vectors of the considered data matrix.
+feature_weights : array
+    Two-dimensional array of feature weights in the POD.
+    The array shape is equal to the number of considered features by the number of singular values.
+    This is equal to the right singular vectors of the considered data matrix.    
+cluster : object
+    Instance of the sklearn class which was used for clustering.
+cluster_components : int, default=1
+    Number of singular vectors / principal components, in decreasing order of weight, on which to do the clustering.
+
+Example usage
+---
+#### Load a dataset to run POD on
+
+    &gt;&gt;&gt; omics = dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;)
+
+#### Run POD on the dataset
+
+To run POD on the full dataset, create a new `POD` object with the dataset as argument:
+
+    &gt;&gt;&gt; pod_result = POD(omics)
+
+To use only a subset of the data, create the `POD` object with the appropriate lists in the `features` and/or `conditions` keyword arguments:
+
+    &gt;&gt;&gt; pod_result = POD(omics, conditions=[&#39;a&#39;])
+
+Clustering can be performed directly when running the analysis. Recommended clustering methods are [`KMeans`](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html) and [`GaussianMixture`](https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html) from the [`sklearn`](https://scikit-learn.org) package.
+
+    &gt;&gt;&gt; from sklearn.cluster import KMeans
+    &gt;&gt;&gt; pod_result = POD(omics, cluster=KMeans(n_clusters=3, n_init=&#39;auto&#39;), cluster_components=4)
+
+    &gt;&gt;&gt; from sklearn.mixture import GaussianMixture
+    &gt;&gt;&gt; pod_result = POD(omics, cluster=GaussianMixture(n_components=3), cluster_components=4)
+&#34;&#34;&#34;
+        if features is None:
+            self.features = ds.features
+        else:
+            for f in features:
+                if f not in ds.features:
+                    raise ValueError(f&#39;Feature &#34;{f}&#34; not found in dataset features: {ds.features}&#39;)
+                self.features = features
+        if conditions is None:
+            self.condition_list = ds.condition_list
+            df = ds.data
+        else:
+            for c in conditions:
+                if c not in ds.condition_list:
+                    raise ValueError(f&#39;Condition &#34;{c}&#34; not found in dataset condition list: {ds.condition_list}&#39;)
+            self.condition_list = conditions
+            df = ds.data[ds.data[ds.condition].isin(conditions)]
+
+        self.ds = Dataset(df, time=ds.time, condition=ds.condition, features=self.features)
+        U, self.sing_values, Vt = linalg.svd(np.asarray(self.ds.data[self.features]))
+        self.feature_weights = Vt.T
+        self.sample_weights = pandas.DataFrame(U, index=df.index)
+        self.sample_weights.insert(0, self.ds.time, self.ds.data[self.ds.time])
+        if self.ds.condition is not None:
+            self.sample_weights.insert(0, self.ds.condition, self.ds.data[self.ds.condition])
+
+        self.cluster = cluster
+        if self.cluster is not None:
+            self.labels = self.cluster.fit_predict(self.feature_weights[:, :cluster_components])
+
+    def interpolate_sample_weights(self, interpolation=&#39;average&#39;, conditions=None, timepoints=None):
+        &#34;&#34;&#34;Compute interpolated sample weights.
+
+Used to approximate a timecourse of component weights for the given conditions.
+Depending on the interpolation method, for each condition, a time course of weights for each component is computed based on the weights of
+individual samples from that condition.
+
+Parameters
+---
+interpolation : str
+    * &#39;average&#39;: average samples from the same time point, no interpolation among different time points
+    Currently only this method is implemented.
+conditions : list of str, default=None
+    List of conditions to retain, default all.
+timepoints : list of timepoint labels / array, default=None
+    List of timepoints for which to compute interpolated weights, 
+    default is the list of timepoints in the dataset.
+    With `interpolation=&#39;average&#39;`, the timepoints given here must also be contained in the dataset!
+
+Returns
+---
+Dataframe with timepoints as index, and interpolated component weights as columns.
+If a condition column is used, the result also contains that column information.
+Columns labelled with integers from 0 correspond to interpolated weights for the components in order of decreasing singular values.
+
+**Note:** If multiple conditions are in the dataset, the timepoint index in the result may not be unique!
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; average_weights = pod_result.interpolate_sample_weights()
+    &gt;&gt;&gt; average_weights.iloc[:2,:3]
+                      0         1         2
+    Timepoint                              
+    0.00      -0.307343 -0.320584  0.245403
+    0.25      -0.279958 -0.144988 -0.251014
+&#34;&#34;&#34;
+        conditions = self._check_conditions(conditions)
+        if timepoints is None:
+            timepoints = self.ds.timepoints
+        if self.ds.condition is None:
+            df = self.sample_weights
+        else:
+            df = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
+        if interpolation == &#39;average&#39;:
+            df = df[df[self.ds.time].isin(timepoints)]
+            if self.ds.condition is not None:
+                res = [df[df[self.ds.condition]==c].groupby(self.ds.time).mean(numeric_only=True) for c in conditions]
+                for i,c in enumerate(conditions):
+                    res[i].insert(0, self.ds.condition, c)
+                return pandas.concat(res)
+            else:
+                return df.groupby(self.ds.time).mean()
+        else:
+            raise ValueError(f&#34;&#34;&#34;Only &#34;interpolation=&#39;average&#39;&#34; is currently implemented, not &#34;{interpolation}&#34;.&#34;&#34;&#34;)
+
+    def get_component(self, component=0):
+        &#34;&#34;&#34;Compute reconstructed data for a single component.
+
+This function computes the data reconstruction for a single component.
+The result is returned in a
+
+Parameters
+---
+component : int, default=0
+    Index of the component for which to do the reconstruction.
+
+Returns
+---
+DataFrame : 
+    Pandas `DataFrame` with the same structure as the dataset that the POD was computed for.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; df = pod_result.get_component(0)
+    &gt;&gt;&gt; df.iloc[:3, :4]
+            Timepoint         0         1         2
+    Sample                                         
+    T0R0          0.0  0.803708  0.746042  0.753983
+    T0R1          0.0  0.791919  0.735099  0.742923
+    T0R2          0.0  0.811034  0.752842  0.760856
+&#34;&#34;&#34;
+        Ui = np.atleast_2d(self.sample_weights[component].to_numpy())
+        Vi = np.atleast_2d(self.feature_weights[:,component])
+        data = Ui.T.dot(Vi) * self.sing_values[component]
+        df = pandas.DataFrame(data, columns=self.features, index=self.ds.data.index)
+        df.insert(0, self.ds.time, self.ds.data[self.ds.time])
+        if self.ds.condition is not None:
+            df.insert(0, self.ds.condition, self.ds.data[self.ds.condition])
+        return df
+
+
+    def plot_singular_values(self, ax=None, trafo=None, fit_line=False, line_plot_args={}, **kwargs):
+        &#34;&#34;&#34;Plot the singular values.
+
+Singular values are plotted in decreasing order in a new axes, or in one passed as argument to the function.
+By default the plotstyle is &#39;--.&#39;, but it can be changed with keyword arguments.
+Optionally, a line can be fitted to (part of) the singular values, to indicate which ones are larger than one would expect from random data.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    Axes to plot into, will be created if None.
+trafo : callable, default=None
+    Transformation to apply to the values before plotting, for example logarithm.
+    The function needs to be vectorized (e.g., use numpy.log, not math.log).
+fit_line : Boolean, float &lt; 1, or int &gt;= 1, default=False
+    Fit a line to (part of) the (transformed) values and show it in the plot.
+    With `fit_line=True`, a line is fitted to all values.
+    If `fit_line` is an integer &gt;= 1, fit the line to that number of smallest values.
+    If it is a float &lt; 1, fit the line to that fraction of smallest values.
+line_plot_args : dictionary, default={}
+    Dictionary of keyword arguments to pass to the plotting of the fitted line
+**kwargs : 
+    Arguments to be passed to the [`plot`](https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html) method when plotting the singular values.
+
+Returns
+---
+If a new figure is created (`ax=None`), then the resulting Figure and Axes object are returned.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_singular_values(fit_line=0.7)
+&#34;&#34;&#34;
+        if ax is None:
+            fig, ax = pyplot.subplots(1, 1)
+            if trafo is None:
+                ax.set_ylabel(&#34;Singular values&#34;)
+            else:
+                ax.set_ylabel(str(trafo) + &#34; singular values&#34;)
+            ax.set_xlabel(&#34;Component index&#34;)
+            new_fig = True
+        else:
+            new_fig = False
+        if trafo is None:
+            values = self.sing_values
+        else:
+            values = trafo(self.sing_values)
+        ax.plot(values, &#39;--.&#39;, **kwargs)
+        if fit_line is not False:
+            if fit_line is True:
+                M = np.ones(shape=(self.sing_values.shape[0], 2))
+                M[:,1] = np.arange(self.sing_values.shape[0])
+                fit_vals = values
+            elif fit_line &lt; 1:
+                num_fit = max(2, int(np.round(fit_line * self.sing_values.shape[0])))
+                M = np.ones(shape=(num_fit, 2))
+                M[:,1] = np.arange(self.sing_values.shape[0]-num_fit, self.sing_values.shape[0])
+                fit_vals = values[-num_fit:]
+            else:
+                M = np.ones(shape=(fit_line, 2))
+                M[:,1] = np.arange(self.sing_values.shape[0]-fit_line, self.sing_values.shape[0])
+                fit_vals = values[-fit_line:]
+            fit_param = linalg.lstsq(M, fit_vals)[0]
+            M_full = np.ones(shape=(self.sing_values.shape[0], 2))
+            M_full[:,1] = np.arange(self.sing_values.shape[0])
+            ax.plot(M_full[:,1], M_full.dot(fit_param), **line_plot_args)
+        if new_fig:
+            return fig, ax
+
+    def plot_features(self, ax=None, components=(0, 1), features=None, annotate=False, labels=None, **kwargs):
+        &#34;&#34;&#34;Component weight plot of the features.
+
+Plots the weights of features in two components as a scatter plot.
+Each data point in the plot corresponds to one feature, where the x-value is the weight of this feature in the first indicated component,
+and the y-value is the weight of this feature in the second indicated component.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    Axes to plot into, if `None` a new axis is created.
+components : tuple of two int values, default=(0, 1)
+    Components to consider for plotting.
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+features : list of str, default=None
+    List of features to include in the plot. If `None`, plot all features.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib `annotate` method.
+    To label only selected features, pass the identifiers of the desired features as list.
+labels : str, default=None
+    Which labels to assign for a possible plot legend.
+    By default, no labels are assigned.
+    With `labels=&#39;clusters&#39;`, labels according to the cluster numbers are assigned.
+    If this argument is not `None` and a new figure is created, also shows the legend.
+    If plotting in a given Axes, the legend has to be activated separately.
+**kwargs : 
+    Additional arguments are passed to matplotlib&#39;s `plot` function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle `&#39;.&#39;` is used.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_features(labels=&#39;clusters&#39;, annotate=[&#39;0&#39;, &#39;49&#39;])
+&#34;&#34;&#34;
+        if ax is None:
+            fig, ax = pyplot.subplots(1, 1)
+            ax.set_xlabel(f&#34;Component {components[0]}&#34;)
+            ax.set_ylabel(f&#34;Component {components[1]}&#34;)
+            new_fig = True
+        else:
+            new_fig = False
+        if features is None:
+            features = self.features
+            feature_index = np.array(range(len(self.features)))
+        else:
+            feature_index = np.array([self.features.index(f) for f in features])
+        if self.cluster is not None:
+            for l in set(self.labels):
+                fi = [i for i in feature_index if self.labels[i] == l]
+                if len(fi) &gt; 0:
+                    x = self.feature_weights[fi, components[0]]
+                    y = self.feature_weights[fi, components[1]]
+                    label = f&#34;Cluster {l}&#34; if labels==&#39;clusters&#39; else None
+                    if len(kwargs):
+                        ax.plot(x, y, label=label, **kwargs)
+                    else:
+                        ax.plot(x, y, &#39;.&#39;, label=label)
+        else:
+            if len(kwargs):
+                ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], **kwargs)
+            else:
+                ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], &#39;.&#39;)
+        if annotate is not False:
+            if annotate is True:
+                annotate = features
+            for f in annotate:
+                fi = self.features.index(f)
+                ax.annotate(f, ((self.feature_weights[fi, components[0]], self.feature_weights[fi, components[1]])))
+        if new_fig:
+            if labels is not None:
+                ax.legend()
+            return fig, ax
+                    
+    def plot_samples(self, ax=None, components=(0, 1), samples=None, annotate=False, labels=None, **kwargs):
+        &#34;&#34;&#34;Component weight plot of the samples.
+
+Plots the weights of samples in two components as a scatter plot.
+Each data point in the plot corresponds to one sample, where the x-value is the weight of this sample in the first indicated component,
+and the y-value is the weight of this sample in the second indicated component.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    Axes to plot into, if `None` a new axis is created.
+components : tuple of two int values, default=(0, 1)
+    Components to consider for plotting.
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+samples : list of str, default=None
+    List of samples (by IDs) to include in the plot. If `None`, plot all samples.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the sample IDs, using the matplotlib `annotate` method.
+    To label only selected samples, pass the IDs of the desired samples as list.
+labels : str, default=None
+    Can be used to either label conditions or timepoints for a plot legend.
+    Options are:
+    - `&#39;condition&#39;` : use condition names as labels.
+    - `&#39;time`&#39; : use timepoint identifiers as labels.
+    - `&#39;both`&#39; : include both condition and timepoint identifiers in the labels (only recommended with few samples / many replicates)
+    When using that option, different conditions / timepoints are plotted with different colors, unless a custom plotstyle is used.
+**kwargs : 
+    Additional arguments are passed to matplotlib&#39;s `plot` function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle `&#39;.&#39;` is used.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_samples(annotate=True, labels=&#39;condition&#39;)
+&#34;&#34;&#34;
+        if ax is None:
+            fig, ax = pyplot.subplots(1, 1)
+            ax.set_xlabel(f&#34;Component {components[0]}&#34;)
+            ax.set_ylabel(f&#34;Component {components[1]}&#34;)
+            new_fig = True
+        else:
+            new_fig = False
+        if samples is None:
+            samples = [s for s in self.ds.data.index]
+            sample_index = np.array(range(len(samples)))
+        else:
+            sample_index = np.array([samples.index(s) for s in samples])
+        data = self.sample_weights.iloc[sample_index, :]
+        have_plot = False
+        if labels is not None:
+            if labels == &#39;condition&#39;:
+                if self.ds.condition is not None:
+                    for c in self.ds.condition_list:
+                        plotsamples = data[data[self.ds.condition] == c]
+                        if len(kwargs) &gt; 0:
+                            ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f&#34;{self.ds.condition} {c}&#34;, **kwargs)
+                        else:
+                            ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], &#39;.&#39;, label=f&#34;{self.ds.condition} {c}&#34;)
+                    have_plot = True
+            elif labels == &#39;time&#39;:
+                for t in self.ds.timepoints:
+                    plotsamples = data[data[self.ds.time] == t]
+                    if len(kwargs) &gt; 0:
+                        ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f&#34;{self.ds.time} {t}&#34;, **kwargs)
+                    else:
+                        ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], &#39;.&#39;, label=f&#34;{self.ds.time} {t}&#34;)
+                have_plot = True
+            elif labels == &#39;both&#39;:
+                if self.ds.condition is None:
+                    self.plot_samples(ax=ax, components=components, samples=samples, labels=&#39;time&#39;, annotate=annotate, **kwargs)
+                else:
+                    for c in self.ds.condition_list:
+                        for t in self.ds.timepoints:
+                            plotsamples = data[(data[self.ds.condition] == c) &amp; (data[self.ds.time] == t)]
+                            if len(kwargs) &gt; 0:
+                                ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f&#34;{c} @ {t}&#34;, **kwargs)
+                            else:
+                                ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], &#39;.&#39;, label=f&#34;{c} @ {t}&#34;)
+                have_plot = True
+            else:
+                raise ValueError(f&#34;Option &#39;{labels}&#39; is not available for the &#39;labels&#39; keyword argument.&#34;)
+            if new_fig and have_plot:
+                ax.legend()
+        if not have_plot:
+            if len(kwargs) &gt; 0:
+                ax.plot(data[(components[0])], data[(components[1])], **kwargs)
+            else:
+                ax.plot(data[(components[0])], data[(components[1])], &#39;.&#39;)
+        if annotate is not False:
+            if annotate is True:
+                annotate = samples
+            for s in annotate:
+                ax.annotate(s, ((data.loc[s, (components[0])], data.loc[s, (components[1])])))
+        if new_fig:
+            return fig, ax
+
+
+    def plot_sample_weights(self, axs=None, components=[0], conditions=None, annotate=False, interpolate=False, interp_style={}, **kwargs):
+        &#34;&#34;&#34;Plot timecourse of sample weights.
+
+A new figure is created by default.
+To plot into an existing figure, pass a list of Axes in the `axs` argument.
+Optionally an interpolation is added to the plot, using the `POD.interpolate_sample_weights()` method.
+If multiple conditions are given, the plot elements are labelled with the condition identifier,
+and if a new figure is created, a legend is shown.
+
+Parameters
+---
+axs : list of matplotlib `Axes`, default=None
+    Axes to plot into, must be one element for each component to be plotted.
+components : list of int, default=[0]
+    Indices of the components for which to plot time courses.
+conditions : list of str, default=None
+    Conditions to include in the plot (default: all)
+interpolate : str, default=False
+    Interpolation method to use, see `POD.interpolate_sample_weights()` for options.
+annotate : Boolean or list of str, default=False
+    Annotate data points with sample IDs. If `True`, annotate all samples, otherwise only the samples for which the IDs are given in the list.
+interp_style : dict, default={}
+    Arguments to pass to the `plot` method when plotting the interpolated time course. 
+    Default is a simple line in the same color as the data points for this condition.
+    Note that if you pass any arguments here, the color is not adjusted to the same as the data points!
+**kwargs : additional arguments
+    These are passed to the `plot` function when plotting the data points.
+    Default is to use the `&#39;.&#39;` plotstyle.
+
+Returns
+---
+Matplotlib figure and list of axes if these are newly created, otherwise nothing.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_sample_weights(annotate=True)
+
+To plot a single condition in a previously created Axes:
+    &gt;&gt;&gt; from matplotlib import pyplot
+    &gt;&gt;&gt; fig, axs = pyplot.subplots(1, 2)
+    &gt;&gt;&gt; pod_result.plot_sample_weights(axs=axs, components=[0, 1], conditions=[&#39;a&#39;], interpolate=&#39;average&#39;)
+&#34;&#34;&#34;
+        if axs is None:
+            fig, axs = pyplot.subplots(1, len(components))
+            new_fig = True
+            if len(components) == 1:
+                axs = [axs]
+            for ax,c in zip(axs, components):
+                ax.set_xlabel(self.ds.time)
+                ax.set_title(f&#34;Component #{c}&#34;)
+            axs[0].set_ylabel(&#34;Weight&#34;)
+        else:
+            if len(components) == 1:
+                axs = [axs]
+            new_fig = False
+        if len(components) != len(axs):
+            raise ValueError(f&#34;List `components` must have same length as `axs`, got {len(components)} vs {len(axs)}.&#34;)
+        conditions = self._check_conditions(conditions)
+        if conditions is not None:
+            weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
+        else:
+            weights = self.sample_weights
+        if interpolate is not False:
+            method = interpolate if type(interpolate)==str else &#39;average&#39;
+            interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+        have_label = set()
+        for comp, ax in zip(components, axs):
+            if conditions is not None:
+                for cond in conditions:
+                    label = cond if cond not in have_label else None
+                    if len(kwargs) &gt; 0:
+                        plot, = ax.plot(weights[weights[self.ds.condition]==cond][self.ds.time], weights[weights[self.ds.condition]==cond][comp], label=label, **kwargs)
+                    else:
+                        plot, = ax.plot(weights[weights[self.ds.condition]==cond][self.ds.time], weights[weights[self.ds.condition]==cond][comp], &#39;.&#39;, label=label)
+                    if interpolate is not False:
+                        label = f&#34;{cond} (interp.)&#34; if cond not in have_label else None
+                        cond_weights = interp_weights[interp_weights[self.ds.condition]==cond]
+                        if len(interp_style) &gt; 0:
+                            ax.plot(cond_weights.index, cond_weights[comp], label=label, **interp_style)
+                        else:
+                            ax.plot(cond_weights.index, cond_weights[comp], label=label, color=plot.get_color())
+                    have_label.add(cond)
+            else:
+                if len(kwargs) &gt; 0:
+                    plot, = ax.plot(weights[self.ds.time], weights[comp], **kwargs)
+                else:
+                    plot, = ax.plot(weights[self.ds.time], weights[comp], &#39;.&#39;)
+                if interpolate is not False:
+                    if len(interp_style) &gt; 0:
+                        ax.plot(interp_weights.index, interp_weights[comp], **interp_style)
+                    else:
+                        ax.plot(interp_weights.index, interp_weights[comp], color=plot.get_color())
+            if annotate is not False:
+                if annotate is True:
+                    annotate = weights.index
+                for l in annotate:
+                    i = weights.index.get_loc(l)
+                    ax.annotate( l, (weights[self.ds.time][i], weights[comp][i]) )
+        if new_fig:
+            fig.legend()
+            return fig, axs
+
+        
+    def plot_data_reconstruction(self, ax=None):
+        &#34;&#34;&#34;Plot data reconstruction
+        &#34;&#34;&#34;
+
+    def plot_feature_trajectories(self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=False, clusters=None, labels=False, **kwargs):
+        &#34;&#34;&#34;Plot trajectories of individual features in component space.
+
+Parameters
+---
+conditions : list of str, default=None
+    List of conditions to plot.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_feature_trajectories()
+        &#34;&#34;&#34;
+        conditions = self._check_conditions(conditions)
+        if ax is None:
+            if conditions is not None:
+                fig, axs = pyplot.subplots(1, len(conditions))
+            else:
+                fig, ax = pyplot.subplots(1, 1)
+                axs = [ax,]
+            for i, ax in enumerate(axs):
+                ax.set_xlabel(f&#34;Component #{components[0]}&#34;)
+                if conditions is not None:
+                    ax.set_title(f&#34;{self.ds.condition} {conditions[i]}&#34;)
+            axs[0].set_ylabel(f&#34;Component #{components[1]}&#34;)
+            new_fig = True
+        else:
+            axs = [ax,]
+            new_fig = False
+
+        if features is None:
+            features = self.features
+            feature_index = np.array(range(len(self.features)))
+        else:
+            feature_index = np.array([self.features.index(f) for f in features])
+
+        if conditions is not None:
+            weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
+        else:
+            weights = self.sample_weights
+        if interpolate is not False:
+            method = interpolate if isinstance(interpolate, str) else &#39;average&#39;
+            interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+
+        for f, fi in zip(features, feature_index):
+            if conditions is not None:
+                for i,c in enumerate(conditions):
+                    traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
+                    traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
+            else:
+                traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
+                traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
+                axs[0].plot(traj0, traj1, &#39;.&#39;, **kwargs)
+
+        # if False: #self.cluster is not None:
+        #     for l in set(self.labels):
+        #         ax.plot(self.feature_weights[feature_index[self.labels==l], components[0]], self.feature_weights[feature_index[self.labels==l], components[1]], &#39;.&#39;)
+        # else:
+        #     ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], &#39;.&#39;)
+        if new_fig:
+            return fig, ax
+        
+    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+        &#34;&#34;&#34;Plot feature trajectories within the component space to given Axes.
+
+This method can only be used to plot raw data points for a single condition into a provided matplotlib Axes.
+Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
+
+See also
+---
+Other methods to plot interpolated trajectory / plot multiple conditions
+
+Parameters
+---
+ax : Matplotlib Axes
+    Axes to plot into.
+components : tuple of int, default=(0,1)
+    Components to consider for plotting. 
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+features : list of str, default=None
+    List of features to include in the plot.
+    If `None`, plot all features.
+condition : str, default=None
+    Identifier of the condition to plot.
+    By default the first of the known conditions is plotted.
+clusters : list of int, default=None
+    List of cluster identifiers to include in the plot, default is all clusters.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib annotate method.
+    To label only selected features, pass the identifiers of the desired features as list.
+labels : str, default=None
+    Which labels to assign for a possible plot legend. By default, no labels are assigned.
+    With `labels=&#39;clusters&#39;`, labels according to the cluster numbers are assigned.
+    With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
+    If plotting in a given Axes, the legend has to be activated separately.
+**kwargs : dict
+    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle &#39;.&#39; is used.
+
+Example usage
+---
+    &gt;&gt;&gt; from matplotlib import pyplot
+    &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; pod_result.plot_feature_trajectory_in(ax, annotate=True)
+&#34;&#34;&#34;
+        conditions = self._check_conditions(condition)
+        condition = conditions[0] if conditions is not None else None
+        df0 = self.get_component(components[0])
+        df1 = self.get_component(components[1])
+        if condition is not None and self.ds.condition is not None:
+            df0 = df0[df0[self.ds.condition] == condition]
+            df1 = df1[df1[self.ds.condition] == condition]
+        if features is None:
+            fs = self.features
+        else:
+            fs = features
+        # features = np.asarray(features)
+        if clusters is None and self.cluster is not None:
+            clusters = list(set(self.labels))
+        if clusters is not None and self.cluster is not None:
+            fc = [(f,l) for f,l in zip(self.features, self.labels) if f in fs and l in clusters]
+            features = [f for f,l in fc]
+            clusters = [l for f,l in fc]
+        else:
+            features = fs
+        labelled = dict()
+        for i,f in enumerate(features):
+            label = None
+            color = None
+            if condition is not None and labels == &#39;condition&#39;:
+                if condition not in labelled:
+                    label = f&#34;{self.ds.condition} {condition}&#34;
+                    labelled[condition] = None
+                else:
+                    color = labelled[condition].get_color()
+            if self.cluster is not None and labels == &#39;cluster&#39;:
+                if clusters[i] not in labelled:
+                    label = f&#34;Cluster {clusters[i]}&#34;
+                    labelled[clusters[i]] = None
+                else:
+                    color = labelled[clusters[i]].get_color()
+            if len(kwargs):
+                plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
+            else:
+                plot, = ax.plot(df0[f], df1[f], &#39;.&#39;, label=label, color=color)
+            if label is not None:
+                if labels == &#39;condition&#39;:
+                    labelled[condition] = plot
+                if labels == &#39;cluster&#39;:
+                    labelled[clusters[i]] = plot
+        if annotate is not False:
+            if annotate is True:
+                annotate = features
+            for a in annotate:
+                ax.annotate(a, (df0[a][0], df1[a][0]) )
+
+
+    def _check_conditions(self, conditions):
+        &#34;&#34;&#34;Check that all conditions are valid.
+
+Returns
+---
+List of conditions to use.
+
+Raises
+---
+`ValueError` if `conditions` is not a valid selection of conditions.
+&#34;&#34;&#34;
+        if self.ds.condition is not None:
+            if conditions is None:
+                conditions = self.condition_list
+            else:
+                for c in conditions:
+                    if c not in self.ds.condition_list:
+                        raise ValueError(f&#39;Condition &#34;{c}&#34; not found in dataset condition list: {self.ds.condition_list}&#39;)
+        else:
+            conditions = None
+        return conditions</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="podomics.pod.POD.get_component"><code class="name flex">
+<span>def <span class="ident">get_component</span></span>(<span>self, component=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute reconstructed data for a single component.</p>
+<p>This function computes the data reconstruction for a single component.
+The result is returned in a</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>component</code></strong> :&ensp;<code>int</code>, default=<code>0</code></dt>
+<dd>Index of the component for which to do the reconstruction.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>DataFrame</code></strong></dt>
+<dd>Pandas <code>DataFrame</code> with the same structure as the dataset that the POD was computed for.</dd>
+</dl>
+<h2 id="example-usage">Example Usage</h2>
+<pre><code>&gt;&gt;&gt; pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
+&gt;&gt;&gt; df = pod_result.get_component(0)
+&gt;&gt;&gt; df.iloc[:3, :4]
+        Timepoint         0         1         2
+Sample                                         
+T0R0          0.0  0.803708  0.746042  0.753983
+T0R1          0.0  0.791919  0.735099  0.742923
+T0R2          0.0  0.811034  0.752842  0.760856
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">    def get_component(self, component=0):
+        &#34;&#34;&#34;Compute reconstructed data for a single component.
+
+This function computes the data reconstruction for a single component.
+The result is returned in a
+
+Parameters
+---
+component : int, default=0
+    Index of the component for which to do the reconstruction.
+
+Returns
+---
+DataFrame : 
+    Pandas `DataFrame` with the same structure as the dataset that the POD was computed for.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; df = pod_result.get_component(0)
+    &gt;&gt;&gt; df.iloc[:3, :4]
+            Timepoint         0         1         2
+    Sample                                         
+    T0R0          0.0  0.803708  0.746042  0.753983
+    T0R1          0.0  0.791919  0.735099  0.742923
+    T0R2          0.0  0.811034  0.752842  0.760856
+&#34;&#34;&#34;
+        Ui = np.atleast_2d(self.sample_weights[component].to_numpy())
+        Vi = np.atleast_2d(self.feature_weights[:,component])
+        data = Ui.T.dot(Vi) * self.sing_values[component]
+        df = pandas.DataFrame(data, columns=self.features, index=self.ds.data.index)
+        df.insert(0, self.ds.time, self.ds.data[self.ds.time])
+        if self.ds.condition is not None:
+            df.insert(0, self.ds.condition, self.ds.data[self.ds.condition])
+        return df</code></pre>
+</details>
+</dd>
+<dt id="podomics.pod.POD.interpolate_sample_weights"><code class="name flex">
+<span>def <span class="ident">interpolate_sample_weights</span></span>(<span>self, interpolation='average', conditions=None, timepoints=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute interpolated sample weights.</p>
+<p>Used to approximate a timecourse of component weights for the given conditions.
+Depending on the interpolation method, for each condition, a time course of weights for each component is computed based on the weights of
+individual samples from that condition.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>interpolation</code></strong> :&ensp;<code>str</code></dt>
+<dd>
+<ul>
+<li>'average': average samples from the same time point, no interpolation among different time points
+Currently only this method is implemented.</li>
+</ul>
+</dd>
+<dt><strong><code>conditions</code></strong> :&ensp;<code>list</code> of <code>str</code>, default=<code>None</code></dt>
+<dd>List of conditions to retain, default all.</dd>
+<dt><strong><code>timepoints</code></strong> :&ensp;<code>list</code> of <code>timepoint labels / array</code>, default=<code>None</code></dt>
+<dd>List of timepoints for which to compute interpolated weights,
+default is the list of timepoints in the dataset.
+With <code>interpolation='average'</code>, the timepoints given here must also be contained in the dataset!</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Dataframe with timepoints as index, and interpolated component weights as columns.
+If a condition column is used, the result also contains that column information.
+Columns labelled with integers from 0 correspond to interpolated weights for the components in order of decreasing singular values.</p>
+<p><strong>Note:</strong> If multiple conditions are in the dataset, the timepoint index in the result may not be unique!</p>
+<h2 id="example-usage">Example Usage</h2>
+<pre><code>&gt;&gt;&gt; pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
+&gt;&gt;&gt; average_weights = pod_result.interpolate_sample_weights()
+&gt;&gt;&gt; average_weights.iloc[:2,:3]
+                  0         1         2
+Timepoint                              
+0.00      -0.307343 -0.320584  0.245403
+0.25      -0.279958 -0.144988 -0.251014
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">    def interpolate_sample_weights(self, interpolation=&#39;average&#39;, conditions=None, timepoints=None):
+        &#34;&#34;&#34;Compute interpolated sample weights.
+
+Used to approximate a timecourse of component weights for the given conditions.
+Depending on the interpolation method, for each condition, a time course of weights for each component is computed based on the weights of
+individual samples from that condition.
+
+Parameters
+---
+interpolation : str
+    * &#39;average&#39;: average samples from the same time point, no interpolation among different time points
+    Currently only this method is implemented.
+conditions : list of str, default=None
+    List of conditions to retain, default all.
+timepoints : list of timepoint labels / array, default=None
+    List of timepoints for which to compute interpolated weights, 
+    default is the list of timepoints in the dataset.
+    With `interpolation=&#39;average&#39;`, the timepoints given here must also be contained in the dataset!
+
+Returns
+---
+Dataframe with timepoints as index, and interpolated component weights as columns.
+If a condition column is used, the result also contains that column information.
+Columns labelled with integers from 0 correspond to interpolated weights for the components in order of decreasing singular values.
+
+**Note:** If multiple conditions are in the dataset, the timepoint index in the result may not be unique!
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; average_weights = pod_result.interpolate_sample_weights()
+    &gt;&gt;&gt; average_weights.iloc[:2,:3]
+                      0         1         2
+    Timepoint                              
+    0.00      -0.307343 -0.320584  0.245403
+    0.25      -0.279958 -0.144988 -0.251014
+&#34;&#34;&#34;
+        conditions = self._check_conditions(conditions)
+        if timepoints is None:
+            timepoints = self.ds.timepoints
+        if self.ds.condition is None:
+            df = self.sample_weights
+        else:
+            df = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
+        if interpolation == &#39;average&#39;:
+            df = df[df[self.ds.time].isin(timepoints)]
+            if self.ds.condition is not None:
+                res = [df[df[self.ds.condition]==c].groupby(self.ds.time).mean(numeric_only=True) for c in conditions]
+                for i,c in enumerate(conditions):
+                    res[i].insert(0, self.ds.condition, c)
+                return pandas.concat(res)
+            else:
+                return df.groupby(self.ds.time).mean()
+        else:
+            raise ValueError(f&#34;&#34;&#34;Only &#34;interpolation=&#39;average&#39;&#34; is currently implemented, not &#34;{interpolation}&#34;.&#34;&#34;&#34;)</code></pre>
+</details>
+</dd>
+<dt id="podomics.pod.POD.plot_data_reconstruction"><code class="name flex">
+<span>def <span class="ident">plot_data_reconstruction</span></span>(<span>self, ax=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot data reconstruction</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_data_reconstruction(self, ax=None):
+    &#34;&#34;&#34;Plot data reconstruction
+    &#34;&#34;&#34;</code></pre>
+</details>
+</dd>
+<dt id="podomics.pod.POD.plot_feature_trajectories"><code class="name flex">
+<span>def <span class="ident">plot_feature_trajectories</span></span>(<span>self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=False, clusters=None, labels=False, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot trajectories of individual features in component space.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>conditions</code></strong> :&ensp;<code>list</code> of <code>str</code>, default=<code>None</code></dt>
+<dd>List of conditions to plot.</dd>
+</dl>
+<h2 id="example-usage">Example Usage</h2>
+<pre><code>&gt;&gt;&gt; pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
+&gt;&gt;&gt; fig, ax = pod_result.plot_feature_trajectories()
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">    def plot_feature_trajectories(self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=False, clusters=None, labels=False, **kwargs):
+        &#34;&#34;&#34;Plot trajectories of individual features in component space.
+
+Parameters
+---
+conditions : list of str, default=None
+    List of conditions to plot.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_feature_trajectories()
+        &#34;&#34;&#34;
+        conditions = self._check_conditions(conditions)
+        if ax is None:
+            if conditions is not None:
+                fig, axs = pyplot.subplots(1, len(conditions))
+            else:
+                fig, ax = pyplot.subplots(1, 1)
+                axs = [ax,]
+            for i, ax in enumerate(axs):
+                ax.set_xlabel(f&#34;Component #{components[0]}&#34;)
+                if conditions is not None:
+                    ax.set_title(f&#34;{self.ds.condition} {conditions[i]}&#34;)
+            axs[0].set_ylabel(f&#34;Component #{components[1]}&#34;)
+            new_fig = True
+        else:
+            axs = [ax,]
+            new_fig = False
+
+        if features is None:
+            features = self.features
+            feature_index = np.array(range(len(self.features)))
+        else:
+            feature_index = np.array([self.features.index(f) for f in features])
+
+        if conditions is not None:
+            weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
+        else:
+            weights = self.sample_weights
+        if interpolate is not False:
+            method = interpolate if isinstance(interpolate, str) else &#39;average&#39;
+            interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+
+        for f, fi in zip(features, feature_index):
+            if conditions is not None:
+                for i,c in enumerate(conditions):
+                    traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
+                    traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
+            else:
+                traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
+                traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
+                axs[0].plot(traj0, traj1, &#39;.&#39;, **kwargs)
+
+        # if False: #self.cluster is not None:
+        #     for l in set(self.labels):
+        #         ax.plot(self.feature_weights[feature_index[self.labels==l], components[0]], self.feature_weights[feature_index[self.labels==l], components[1]], &#39;.&#39;)
+        # else:
+        #     ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], &#39;.&#39;)
+        if new_fig:
+            return fig, ax</code></pre>
+</details>
+</dd>
+<dt id="podomics.pod.POD.plot_feature_trajectory_in"><code class="name flex">
+<span>def <span class="ident">plot_feature_trajectory_in</span></span>(<span>self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot feature trajectories within the component space to given Axes.</p>
+<p>This method can only be used to plot raw data points for a single condition into a provided matplotlib Axes.
+Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.</p>
+<h2 id="see-also">See Also</h2>
+<p><code>Other methods to plot interpolated trajectory / plot multiple conditions</code></p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>Matplotlib Axes</code></dt>
+<dd>Axes to plot into.</dd>
+<dt><strong><code>components</code></strong> :&ensp;<code>tuple</code> of <code>int</code>, default=<code>(0,1)</code></dt>
+<dd>Components to consider for plotting.
+First element refer to the component weights to use for x-values, second element to the weights to use for y-values.</dd>
+<dt><strong><code>features</code></strong> :&ensp;<code>list</code> of <code>str</code>, default=<code>None</code></dt>
+<dd>List of features to include in the plot.
+If <code>None</code>, plot all features.</dd>
+<dt><strong><code>condition</code></strong> :&ensp;<code>str</code>, default=<code>None</code></dt>
+<dd>Identifier of the condition to plot.
+By default the first of the known conditions is plotted.</dd>
+<dt><strong><code>clusters</code></strong> :&ensp;<code>list</code> of <code>int</code>, default=<code>None</code></dt>
+<dd>List of cluster identifiers to include in the plot, default is all clusters.</dd>
+<dt><strong><code>annotate</code></strong> :&ensp;<code>Boolean</code> or <code>list</code> of <code>feature identifiers</code>, default=<code>False</code></dt>
+<dd>Label the data points in the plot with the feature names, using the matplotlib annotate method.
+To label only selected features, pass the identifiers of the desired features as list.</dd>
+<dt><strong><code>labels</code></strong> :&ensp;<code>str</code>, default=<code>None</code></dt>
+<dd>Which labels to assign for a possible plot legend. By default, no labels are assigned.
+With <code>labels='clusters'</code>, labels according to the cluster numbers are assigned.
+With <code>labels='condition'</code>, labels according to the condition identifier are assigned.
+If plotting in a given Axes, the legend has to be activated separately.</dd>
+<dt><strong><code>**kwargs</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Additional arguments are passed to matplotlib's plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle '.' is used.</dd>
+</dl>
+<h2 id="example-usage">Example Usage</h2>
+<pre><code>&gt;&gt;&gt; from matplotlib import pyplot
+&gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
+&gt;&gt;&gt; pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
+&gt;&gt;&gt; pod_result.plot_feature_trajectory_in(ax, annotate=True)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+        &#34;&#34;&#34;Plot feature trajectories within the component space to given Axes.
+
+This method can only be used to plot raw data points for a single condition into a provided matplotlib Axes.
+Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
+
+See also
+---
+Other methods to plot interpolated trajectory / plot multiple conditions
+
+Parameters
+---
+ax : Matplotlib Axes
+    Axes to plot into.
+components : tuple of int, default=(0,1)
+    Components to consider for plotting. 
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+features : list of str, default=None
+    List of features to include in the plot.
+    If `None`, plot all features.
+condition : str, default=None
+    Identifier of the condition to plot.
+    By default the first of the known conditions is plotted.
+clusters : list of int, default=None
+    List of cluster identifiers to include in the plot, default is all clusters.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib annotate method.
+    To label only selected features, pass the identifiers of the desired features as list.
+labels : str, default=None
+    Which labels to assign for a possible plot legend. By default, no labels are assigned.
+    With `labels=&#39;clusters&#39;`, labels according to the cluster numbers are assigned.
+    With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
+    If plotting in a given Axes, the legend has to be activated separately.
+**kwargs : dict
+    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle &#39;.&#39; is used.
+
+Example usage
+---
+    &gt;&gt;&gt; from matplotlib import pyplot
+    &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
+    &gt;&gt;&gt; pod_result.plot_feature_trajectory_in(ax, annotate=True)
+&#34;&#34;&#34;
+        conditions = self._check_conditions(condition)
+        condition = conditions[0] if conditions is not None else None
+        df0 = self.get_component(components[0])
+        df1 = self.get_component(components[1])
+        if condition is not None and self.ds.condition is not None:
+            df0 = df0[df0[self.ds.condition] == condition]
+            df1 = df1[df1[self.ds.condition] == condition]
+        if features is None:
+            fs = self.features
+        else:
+            fs = features
+        # features = np.asarray(features)
+        if clusters is None and self.cluster is not None:
+            clusters = list(set(self.labels))
+        if clusters is not None and self.cluster is not None:
+            fc = [(f,l) for f,l in zip(self.features, self.labels) if f in fs and l in clusters]
+            features = [f for f,l in fc]
+            clusters = [l for f,l in fc]
+        else:
+            features = fs
+        labelled = dict()
+        for i,f in enumerate(features):
+            label = None
+            color = None
+            if condition is not None and labels == &#39;condition&#39;:
+                if condition not in labelled:
+                    label = f&#34;{self.ds.condition} {condition}&#34;
+                    labelled[condition] = None
+                else:
+                    color = labelled[condition].get_color()
+            if self.cluster is not None and labels == &#39;cluster&#39;:
+                if clusters[i] not in labelled:
+                    label = f&#34;Cluster {clusters[i]}&#34;
+                    labelled[clusters[i]] = None
+                else:
+                    color = labelled[clusters[i]].get_color()
+            if len(kwargs):
+                plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
+            else:
+                plot, = ax.plot(df0[f], df1[f], &#39;.&#39;, label=label, color=color)
+            if label is not None:
+                if labels == &#39;condition&#39;:
+                    labelled[condition] = plot
+                if labels == &#39;cluster&#39;:
+                    labelled[clusters[i]] = plot
+        if annotate is not False:
+            if annotate is True:
+                annotate = features
+            for a in annotate:
+                ax.annotate(a, (df0[a][0], df1[a][0]) )</code></pre>
+</details>
+</dd>
+<dt id="podomics.pod.POD.plot_features"><code class="name flex">
+<span>def <span class="ident">plot_features</span></span>(<span>self, ax=None, components=(0, 1), features=None, annotate=False, labels=None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Component weight plot of the features.</p>
+<p>Plots the weights of features in two components as a scatter plot.
+Each data point in the plot corresponds to one feature, where the x-value is the weight of this feature in the first indicated component,
+and the y-value is the weight of this feature in the second indicated component.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib Axes</code>, default=<code>None</code></dt>
+<dd>Axes to plot into, if <code>None</code> a new axis is created.</dd>
+<dt><strong><code>components</code></strong> :&ensp;<code>tuple</code> of <code>two int values</code>, default=<code>(0, 1)</code></dt>
+<dd>Components to consider for plotting.
+First element refer to the component weights to use for x-values, second element to the weights to use for y-values.</dd>
+<dt><strong><code>features</code></strong> :&ensp;<code>list</code> of <code>str</code>, default=<code>None</code></dt>
+<dd>List of features to include in the plot. If <code>None</code>, plot all features.</dd>
+<dt><strong><code>annotate</code></strong> :&ensp;<code>Boolean</code> or <code>list</code> of <code>feature identifiers</code>, default=<code>False</code></dt>
+<dd>Label the data points in the plot with the feature names, using the matplotlib <code>annotate</code> method.
+To label only selected features, pass the identifiers of the desired features as list.</dd>
+<dt><strong><code>labels</code></strong> :&ensp;<code>str</code>, default=<code>None</code></dt>
+<dd>Which labels to assign for a possible plot legend.
+By default, no labels are assigned.
+With <code>labels='clusters'</code>, labels according to the cluster numbers are assigned.
+If this argument is not <code>None</code> and a new figure is created, also shows the legend.
+If plotting in a given Axes, the legend has to be activated separately.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd>Additional arguments are passed to matplotlib's <code>plot</code> function and can be used to change the plot style etc.
+If no arguments are given, the plotstyle <code>'.'</code> is used.</dd>
+</dl>
+<h2 id="example-usage">Example Usage</h2>
+<pre><code>&gt;&gt;&gt; pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
+&gt;&gt;&gt; fig, ax = pod_result.plot_features(labels='clusters', annotate=['0', '49'])
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">    def plot_features(self, ax=None, components=(0, 1), features=None, annotate=False, labels=None, **kwargs):
+        &#34;&#34;&#34;Component weight plot of the features.
+
+Plots the weights of features in two components as a scatter plot.
+Each data point in the plot corresponds to one feature, where the x-value is the weight of this feature in the first indicated component,
+and the y-value is the weight of this feature in the second indicated component.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    Axes to plot into, if `None` a new axis is created.
+components : tuple of two int values, default=(0, 1)
+    Components to consider for plotting.
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+features : list of str, default=None
+    List of features to include in the plot. If `None`, plot all features.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib `annotate` method.
+    To label only selected features, pass the identifiers of the desired features as list.
+labels : str, default=None
+    Which labels to assign for a possible plot legend.
+    By default, no labels are assigned.
+    With `labels=&#39;clusters&#39;`, labels according to the cluster numbers are assigned.
+    If this argument is not `None` and a new figure is created, also shows the legend.
+    If plotting in a given Axes, the legend has to be activated separately.
+**kwargs : 
+    Additional arguments are passed to matplotlib&#39;s `plot` function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle `&#39;.&#39;` is used.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_features(labels=&#39;clusters&#39;, annotate=[&#39;0&#39;, &#39;49&#39;])
+&#34;&#34;&#34;
+        if ax is None:
+            fig, ax = pyplot.subplots(1, 1)
+            ax.set_xlabel(f&#34;Component {components[0]}&#34;)
+            ax.set_ylabel(f&#34;Component {components[1]}&#34;)
+            new_fig = True
+        else:
+            new_fig = False
+        if features is None:
+            features = self.features
+            feature_index = np.array(range(len(self.features)))
+        else:
+            feature_index = np.array([self.features.index(f) for f in features])
+        if self.cluster is not None:
+            for l in set(self.labels):
+                fi = [i for i in feature_index if self.labels[i] == l]
+                if len(fi) &gt; 0:
+                    x = self.feature_weights[fi, components[0]]
+                    y = self.feature_weights[fi, components[1]]
+                    label = f&#34;Cluster {l}&#34; if labels==&#39;clusters&#39; else None
+                    if len(kwargs):
+                        ax.plot(x, y, label=label, **kwargs)
+                    else:
+                        ax.plot(x, y, &#39;.&#39;, label=label)
+        else:
+            if len(kwargs):
+                ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], **kwargs)
+            else:
+                ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], &#39;.&#39;)
+        if annotate is not False:
+            if annotate is True:
+                annotate = features
+            for f in annotate:
+                fi = self.features.index(f)
+                ax.annotate(f, ((self.feature_weights[fi, components[0]], self.feature_weights[fi, components[1]])))
+        if new_fig:
+            if labels is not None:
+                ax.legend()
+            return fig, ax</code></pre>
+</details>
+</dd>
+<dt id="podomics.pod.POD.plot_sample_weights"><code class="name flex">
+<span>def <span class="ident">plot_sample_weights</span></span>(<span>self, axs=None, components=[0], conditions=None, annotate=False, interpolate=False, interp_style={}, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot timecourse of sample weights.</p>
+<p>A new figure is created by default.
+To plot into an existing figure, pass a list of Axes in the <code>axs</code> argument.
+Optionally an interpolation is added to the plot, using the <code><a title="podomics.pod.POD.interpolate_sample_weights" href="#podomics.pod.POD.interpolate_sample_weights">POD.interpolate_sample_weights()</a></code> method.
+If multiple conditions are given, the plot elements are labelled with the condition identifier,
+and if a new figure is created, a legend is shown.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>axs</code></strong> :&ensp;<code>list</code> of <code>matplotlib </code>Axes<code>`, default=</code>None`</dt>
+<dd>Axes to plot into, must be one element for each component to be plotted.</dd>
+<dt><strong><code>components</code></strong> :&ensp;<code>list</code> of <code>int</code>, default=<code>[0]</code></dt>
+<dd>Indices of the components for which to plot time courses.</dd>
+<dt><strong><code>conditions</code></strong> :&ensp;<code>list</code> of <code>str</code>, default=<code>None</code></dt>
+<dd>Conditions to include in the plot (default: all)</dd>
+<dt><strong><code>interpolate</code></strong> :&ensp;<code>str</code>, default=<code>False</code></dt>
+<dd>Interpolation method to use, see <code><a title="podomics.pod.POD.interpolate_sample_weights" href="#podomics.pod.POD.interpolate_sample_weights">POD.interpolate_sample_weights()</a></code> for options.</dd>
+<dt><strong><code>annotate</code></strong> :&ensp;<code>Boolean</code> or <code>list</code> of <code>str</code>, default=<code>False</code></dt>
+<dd>Annotate data points with sample IDs. If <code>True</code>, annotate all samples, otherwise only the samples for which the IDs are given in the list.</dd>
+<dt><strong><code>interp_style</code></strong> :&ensp;<code>dict</code>, default=<code>{}</code></dt>
+<dd>Arguments to pass to the <code>plot</code> method when plotting the interpolated time course.
+Default is a simple line in the same color as the data points for this condition.
+Note that if you pass any arguments here, the color is not adjusted to the same as the data points!</dd>
+<dt><strong><code>**kwargs</code></strong> :&ensp;<code>additional arguments</code></dt>
+<dd>These are passed to the <code>plot</code> function when plotting the data points.
+Default is to use the <code>'.'</code> plotstyle.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Matplotlib figure and list of axes if these are newly created, otherwise nothing.</p>
+<h2 id="example-usage">Example Usage</h2>
+<pre><code>&gt;&gt;&gt; pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
+&gt;&gt;&gt; fig, ax = pod_result.plot_sample_weights(annotate=True)
+</code></pre>
+<p>To plot a single condition in a previously created Axes:
+&gt;&gt;&gt; from matplotlib import pyplot
+&gt;&gt;&gt; fig, axs = pyplot.subplots(1, 2)
+&gt;&gt;&gt; pod_result.plot_sample_weights(axs=axs, components=[0, 1], conditions=['a'], interpolate='average')</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">    def plot_sample_weights(self, axs=None, components=[0], conditions=None, annotate=False, interpolate=False, interp_style={}, **kwargs):
+        &#34;&#34;&#34;Plot timecourse of sample weights.
+
+A new figure is created by default.
+To plot into an existing figure, pass a list of Axes in the `axs` argument.
+Optionally an interpolation is added to the plot, using the `POD.interpolate_sample_weights()` method.
+If multiple conditions are given, the plot elements are labelled with the condition identifier,
+and if a new figure is created, a legend is shown.
+
+Parameters
+---
+axs : list of matplotlib `Axes`, default=None
+    Axes to plot into, must be one element for each component to be plotted.
+components : list of int, default=[0]
+    Indices of the components for which to plot time courses.
+conditions : list of str, default=None
+    Conditions to include in the plot (default: all)
+interpolate : str, default=False
+    Interpolation method to use, see `POD.interpolate_sample_weights()` for options.
+annotate : Boolean or list of str, default=False
+    Annotate data points with sample IDs. If `True`, annotate all samples, otherwise only the samples for which the IDs are given in the list.
+interp_style : dict, default={}
+    Arguments to pass to the `plot` method when plotting the interpolated time course. 
+    Default is a simple line in the same color as the data points for this condition.
+    Note that if you pass any arguments here, the color is not adjusted to the same as the data points!
+**kwargs : additional arguments
+    These are passed to the `plot` function when plotting the data points.
+    Default is to use the `&#39;.&#39;` plotstyle.
+
+Returns
+---
+Matplotlib figure and list of axes if these are newly created, otherwise nothing.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_sample_weights(annotate=True)
+
+To plot a single condition in a previously created Axes:
+    &gt;&gt;&gt; from matplotlib import pyplot
+    &gt;&gt;&gt; fig, axs = pyplot.subplots(1, 2)
+    &gt;&gt;&gt; pod_result.plot_sample_weights(axs=axs, components=[0, 1], conditions=[&#39;a&#39;], interpolate=&#39;average&#39;)
+&#34;&#34;&#34;
+        if axs is None:
+            fig, axs = pyplot.subplots(1, len(components))
+            new_fig = True
+            if len(components) == 1:
+                axs = [axs]
+            for ax,c in zip(axs, components):
+                ax.set_xlabel(self.ds.time)
+                ax.set_title(f&#34;Component #{c}&#34;)
+            axs[0].set_ylabel(&#34;Weight&#34;)
+        else:
+            if len(components) == 1:
+                axs = [axs]
+            new_fig = False
+        if len(components) != len(axs):
+            raise ValueError(f&#34;List `components` must have same length as `axs`, got {len(components)} vs {len(axs)}.&#34;)
+        conditions = self._check_conditions(conditions)
+        if conditions is not None:
+            weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
+        else:
+            weights = self.sample_weights
+        if interpolate is not False:
+            method = interpolate if type(interpolate)==str else &#39;average&#39;
+            interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+        have_label = set()
+        for comp, ax in zip(components, axs):
+            if conditions is not None:
+                for cond in conditions:
+                    label = cond if cond not in have_label else None
+                    if len(kwargs) &gt; 0:
+                        plot, = ax.plot(weights[weights[self.ds.condition]==cond][self.ds.time], weights[weights[self.ds.condition]==cond][comp], label=label, **kwargs)
+                    else:
+                        plot, = ax.plot(weights[weights[self.ds.condition]==cond][self.ds.time], weights[weights[self.ds.condition]==cond][comp], &#39;.&#39;, label=label)
+                    if interpolate is not False:
+                        label = f&#34;{cond} (interp.)&#34; if cond not in have_label else None
+                        cond_weights = interp_weights[interp_weights[self.ds.condition]==cond]
+                        if len(interp_style) &gt; 0:
+                            ax.plot(cond_weights.index, cond_weights[comp], label=label, **interp_style)
+                        else:
+                            ax.plot(cond_weights.index, cond_weights[comp], label=label, color=plot.get_color())
+                    have_label.add(cond)
+            else:
+                if len(kwargs) &gt; 0:
+                    plot, = ax.plot(weights[self.ds.time], weights[comp], **kwargs)
+                else:
+                    plot, = ax.plot(weights[self.ds.time], weights[comp], &#39;.&#39;)
+                if interpolate is not False:
+                    if len(interp_style) &gt; 0:
+                        ax.plot(interp_weights.index, interp_weights[comp], **interp_style)
+                    else:
+                        ax.plot(interp_weights.index, interp_weights[comp], color=plot.get_color())
+            if annotate is not False:
+                if annotate is True:
+                    annotate = weights.index
+                for l in annotate:
+                    i = weights.index.get_loc(l)
+                    ax.annotate( l, (weights[self.ds.time][i], weights[comp][i]) )
+        if new_fig:
+            fig.legend()
+            return fig, axs</code></pre>
+</details>
+</dd>
+<dt id="podomics.pod.POD.plot_samples"><code class="name flex">
+<span>def <span class="ident">plot_samples</span></span>(<span>self, ax=None, components=(0, 1), samples=None, annotate=False, labels=None, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Component weight plot of the samples.</p>
+<p>Plots the weights of samples in two components as a scatter plot.
+Each data point in the plot corresponds to one sample, where the x-value is the weight of this sample in the first indicated component,
+and the y-value is the weight of this sample in the second indicated component.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib Axes</code>, default=<code>None</code></dt>
+<dd>Axes to plot into, if <code>None</code> a new axis is created.</dd>
+<dt><strong><code>components</code></strong> :&ensp;<code>tuple</code> of <code>two int values</code>, default=<code>(0, 1)</code></dt>
+<dd>Components to consider for plotting.
+First element refer to the component weights to use for x-values, second element to the weights to use for y-values.</dd>
+<dt><strong><code>samples</code></strong> :&ensp;<code>list</code> of <code>str</code>, default=<code>None</code></dt>
+<dd>List of samples (by IDs) to include in the plot. If <code>None</code>, plot all samples.</dd>
+<dt><strong><code>annotate</code></strong> :&ensp;<code>Boolean</code> or <code>list</code> of <code>feature identifiers</code>, default=<code>False</code></dt>
+<dd>Label the data points in the plot with the sample IDs, using the matplotlib <code>annotate</code> method.
+To label only selected samples, pass the IDs of the desired samples as list.</dd>
+<dt><strong><code>labels</code></strong> :&ensp;<code>str</code>, default=<code>None</code></dt>
+<dd>Can be used to either label conditions or timepoints for a plot legend.
+Options are:
+- <code>'condition'</code> : use condition names as labels.
+- <code>'time</code>' : use timepoint identifiers as labels.
+- <code>'both</code>' : include both condition and timepoint identifiers in the labels (only recommended with few samples / many replicates)
+When using that option, different conditions / timepoints are plotted with different colors, unless a custom plotstyle is used.</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd>Additional arguments are passed to matplotlib's <code>plot</code> function and can be used to change the plot style etc.
+If no arguments are given, the plotstyle <code>'.'</code> is used.</dd>
+</dl>
+<h2 id="example-usage">Example Usage</h2>
+<pre><code>&gt;&gt;&gt; pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
+&gt;&gt;&gt; fig, ax = pod_result.plot_samples(annotate=True, labels='condition')
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">    def plot_samples(self, ax=None, components=(0, 1), samples=None, annotate=False, labels=None, **kwargs):
+        &#34;&#34;&#34;Component weight plot of the samples.
+
+Plots the weights of samples in two components as a scatter plot.
+Each data point in the plot corresponds to one sample, where the x-value is the weight of this sample in the first indicated component,
+and the y-value is the weight of this sample in the second indicated component.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    Axes to plot into, if `None` a new axis is created.
+components : tuple of two int values, default=(0, 1)
+    Components to consider for plotting.
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+samples : list of str, default=None
+    List of samples (by IDs) to include in the plot. If `None`, plot all samples.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the sample IDs, using the matplotlib `annotate` method.
+    To label only selected samples, pass the IDs of the desired samples as list.
+labels : str, default=None
+    Can be used to either label conditions or timepoints for a plot legend.
+    Options are:
+    - `&#39;condition&#39;` : use condition names as labels.
+    - `&#39;time`&#39; : use timepoint identifiers as labels.
+    - `&#39;both`&#39; : include both condition and timepoint identifiers in the labels (only recommended with few samples / many replicates)
+    When using that option, different conditions / timepoints are plotted with different colors, unless a custom plotstyle is used.
+**kwargs : 
+    Additional arguments are passed to matplotlib&#39;s `plot` function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle `&#39;.&#39;` is used.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_samples(annotate=True, labels=&#39;condition&#39;)
+&#34;&#34;&#34;
+        if ax is None:
+            fig, ax = pyplot.subplots(1, 1)
+            ax.set_xlabel(f&#34;Component {components[0]}&#34;)
+            ax.set_ylabel(f&#34;Component {components[1]}&#34;)
+            new_fig = True
+        else:
+            new_fig = False
+        if samples is None:
+            samples = [s for s in self.ds.data.index]
+            sample_index = np.array(range(len(samples)))
+        else:
+            sample_index = np.array([samples.index(s) for s in samples])
+        data = self.sample_weights.iloc[sample_index, :]
+        have_plot = False
+        if labels is not None:
+            if labels == &#39;condition&#39;:
+                if self.ds.condition is not None:
+                    for c in self.ds.condition_list:
+                        plotsamples = data[data[self.ds.condition] == c]
+                        if len(kwargs) &gt; 0:
+                            ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f&#34;{self.ds.condition} {c}&#34;, **kwargs)
+                        else:
+                            ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], &#39;.&#39;, label=f&#34;{self.ds.condition} {c}&#34;)
+                    have_plot = True
+            elif labels == &#39;time&#39;:
+                for t in self.ds.timepoints:
+                    plotsamples = data[data[self.ds.time] == t]
+                    if len(kwargs) &gt; 0:
+                        ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f&#34;{self.ds.time} {t}&#34;, **kwargs)
+                    else:
+                        ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], &#39;.&#39;, label=f&#34;{self.ds.time} {t}&#34;)
+                have_plot = True
+            elif labels == &#39;both&#39;:
+                if self.ds.condition is None:
+                    self.plot_samples(ax=ax, components=components, samples=samples, labels=&#39;time&#39;, annotate=annotate, **kwargs)
+                else:
+                    for c in self.ds.condition_list:
+                        for t in self.ds.timepoints:
+                            plotsamples = data[(data[self.ds.condition] == c) &amp; (data[self.ds.time] == t)]
+                            if len(kwargs) &gt; 0:
+                                ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], label=f&#34;{c} @ {t}&#34;, **kwargs)
+                            else:
+                                ax.plot(plotsamples[(components[0])], plotsamples[(components[1])], &#39;.&#39;, label=f&#34;{c} @ {t}&#34;)
+                have_plot = True
+            else:
+                raise ValueError(f&#34;Option &#39;{labels}&#39; is not available for the &#39;labels&#39; keyword argument.&#34;)
+            if new_fig and have_plot:
+                ax.legend()
+        if not have_plot:
+            if len(kwargs) &gt; 0:
+                ax.plot(data[(components[0])], data[(components[1])], **kwargs)
+            else:
+                ax.plot(data[(components[0])], data[(components[1])], &#39;.&#39;)
+        if annotate is not False:
+            if annotate is True:
+                annotate = samples
+            for s in annotate:
+                ax.annotate(s, ((data.loc[s, (components[0])], data.loc[s, (components[1])])))
+        if new_fig:
+            return fig, ax</code></pre>
+</details>
+</dd>
+<dt id="podomics.pod.POD.plot_singular_values"><code class="name flex">
+<span>def <span class="ident">plot_singular_values</span></span>(<span>self, ax=None, trafo=None, fit_line=False, line_plot_args={}, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot the singular values.</p>
+<p>Singular values are plotted in decreasing order in a new axes, or in one passed as argument to the function.
+By default the plotstyle is '&ndash;.', but it can be changed with keyword arguments.
+Optionally, a line can be fitted to (part of) the singular values, to indicate which ones are larger than one would expect from random data.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib Axes</code>, default=<code>None</code></dt>
+<dd>Axes to plot into, will be created if None.</dd>
+<dt><strong><code>trafo</code></strong> :&ensp;<code>callable</code>, default=<code>None</code></dt>
+<dd>Transformation to apply to the values before plotting, for example logarithm.
+The function needs to be vectorized (e.g., use numpy.log, not math.log).</dd>
+<dt><strong><code>fit_line</code></strong> :&ensp;<code>Boolean, float &lt; 1,</code> or <code>int &gt;= 1</code>, default=<code>False</code></dt>
+<dd>Fit a line to (part of) the (transformed) values and show it in the plot.
+With <code>fit_line=True</code>, a line is fitted to all values.
+If <code>fit_line</code> is an integer &gt;= 1, fit the line to that number of smallest values.
+If it is a float &lt; 1, fit the line to that fraction of smallest values.</dd>
+<dt><strong><code>line_plot_args</code></strong> :&ensp;<code>dictionary</code>, default=<code>{}</code></dt>
+<dd>Dictionary of keyword arguments to pass to the plotting of the fitted line</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd>Arguments to be passed to the <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html"><code>plot</code></a> method when plotting the singular values.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>If a new figure is created (<code>ax=None</code>), then the resulting Figure and Axes object are returned.</p>
+<h2 id="example-usage">Example Usage</h2>
+<pre><code>&gt;&gt;&gt; pod_result = POD(dataset.read_csv("examples/exampledata3.csv", sample="Sample", condition="Condition"))
+&gt;&gt;&gt; fig, ax = pod_result.plot_singular_values(fit_line=0.7)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">    def plot_singular_values(self, ax=None, trafo=None, fit_line=False, line_plot_args={}, **kwargs):
+        &#34;&#34;&#34;Plot the singular values.
+
+Singular values are plotted in decreasing order in a new axes, or in one passed as argument to the function.
+By default the plotstyle is &#39;--.&#39;, but it can be changed with keyword arguments.
+Optionally, a line can be fitted to (part of) the singular values, to indicate which ones are larger than one would expect from random data.
+
+Parameters
+---
+ax : matplotlib Axes, default=None
+    Axes to plot into, will be created if None.
+trafo : callable, default=None
+    Transformation to apply to the values before plotting, for example logarithm.
+    The function needs to be vectorized (e.g., use numpy.log, not math.log).
+fit_line : Boolean, float &lt; 1, or int &gt;= 1, default=False
+    Fit a line to (part of) the (transformed) values and show it in the plot.
+    With `fit_line=True`, a line is fitted to all values.
+    If `fit_line` is an integer &gt;= 1, fit the line to that number of smallest values.
+    If it is a float &lt; 1, fit the line to that fraction of smallest values.
+line_plot_args : dictionary, default={}
+    Dictionary of keyword arguments to pass to the plotting of the fitted line
+**kwargs : 
+    Arguments to be passed to the [`plot`](https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html) method when plotting the singular values.
+
+Returns
+---
+If a new figure is created (`ax=None`), then the resulting Figure and Axes object are returned.
+
+Example usage
+---
+    &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata3.csv&#34;, sample=&#34;Sample&#34;, condition=&#34;Condition&#34;))
+    &gt;&gt;&gt; fig, ax = pod_result.plot_singular_values(fit_line=0.7)
+&#34;&#34;&#34;
+        if ax is None:
+            fig, ax = pyplot.subplots(1, 1)
+            if trafo is None:
+                ax.set_ylabel(&#34;Singular values&#34;)
+            else:
+                ax.set_ylabel(str(trafo) + &#34; singular values&#34;)
+            ax.set_xlabel(&#34;Component index&#34;)
+            new_fig = True
+        else:
+            new_fig = False
+        if trafo is None:
+            values = self.sing_values
+        else:
+            values = trafo(self.sing_values)
+        ax.plot(values, &#39;--.&#39;, **kwargs)
+        if fit_line is not False:
+            if fit_line is True:
+                M = np.ones(shape=(self.sing_values.shape[0], 2))
+                M[:,1] = np.arange(self.sing_values.shape[0])
+                fit_vals = values
+            elif fit_line &lt; 1:
+                num_fit = max(2, int(np.round(fit_line * self.sing_values.shape[0])))
+                M = np.ones(shape=(num_fit, 2))
+                M[:,1] = np.arange(self.sing_values.shape[0]-num_fit, self.sing_values.shape[0])
+                fit_vals = values[-num_fit:]
+            else:
+                M = np.ones(shape=(fit_line, 2))
+                M[:,1] = np.arange(self.sing_values.shape[0]-fit_line, self.sing_values.shape[0])
+                fit_vals = values[-fit_line:]
+            fit_param = linalg.lstsq(M, fit_vals)[0]
+            M_full = np.ones(shape=(self.sing_values.shape[0], 2))
+            M_full[:,1] = np.arange(self.sing_values.shape[0])
+            ax.plot(M_full[:,1], M_full.dot(fit_param), **line_plot_args)
+        if new_fig:
+            return fig, ax</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="podomics" href="index.html">podomics</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="podomics.pod.POD" href="#podomics.pod.POD">POD</a></code></h4>
+<ul class="">
+<li><code><a title="podomics.pod.POD.get_component" href="#podomics.pod.POD.get_component">get_component</a></code></li>
+<li><code><a title="podomics.pod.POD.interpolate_sample_weights" href="#podomics.pod.POD.interpolate_sample_weights">interpolate_sample_weights</a></code></li>
+<li><code><a title="podomics.pod.POD.plot_data_reconstruction" href="#podomics.pod.POD.plot_data_reconstruction">plot_data_reconstruction</a></code></li>
+<li><code><a title="podomics.pod.POD.plot_feature_trajectories" href="#podomics.pod.POD.plot_feature_trajectories">plot_feature_trajectories</a></code></li>
+<li><code><a title="podomics.pod.POD.plot_feature_trajectory_in" href="#podomics.pod.POD.plot_feature_trajectory_in">plot_feature_trajectory_in</a></code></li>
+<li><code><a title="podomics.pod.POD.plot_features" href="#podomics.pod.POD.plot_features">plot_features</a></code></li>
+<li><code><a title="podomics.pod.POD.plot_sample_weights" href="#podomics.pod.POD.plot_sample_weights">plot_sample_weights</a></code></li>
+<li><code><a title="podomics.pod.POD.plot_samples" href="#podomics.pod.POD.plot_samples">plot_samples</a></code></li>
+<li><code><a title="podomics.pod.POD.plot_singular_values" href="#podomics.pod.POD.plot_singular_values">plot_singular_values</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>

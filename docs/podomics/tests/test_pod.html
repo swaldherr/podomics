@@ -1,0 +1,1118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.8.1" />
+<title>podomics.tests.test_pod API documentation</title>
+<meta name="description" content="Tests for pod module" />
+<link href='https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css' rel='stylesheet'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/8.0.0/sanitize.min.css' rel='stylesheet'>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" rel="stylesheet">
+<style>.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>podomics.tests.test_pod</code></h1>
+</header>
+<section id="section-intro">
+<p>Tests for pod module</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Tests for pod module
+&#34;&#34;&#34;
+
+from unittest import TestCase
+
+import pandas
+import os
+import numpy as np
+from sklearn import cluster
+from scipy import linalg
+
+from numpy import testing
+
+from .. import pod
+from .. import dataset
+
+class TestRunPOD(TestCase):
+    &#34;&#34;&#34;
+    Test constructor for POD class
+    &#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    example_ds = [dataset.read_csv(f, sample=&#34;Sample&#34;) for f in example_data[:2]]
+    example_ds.append( dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;) )
+
+    def test_default_call(self):
+        &#34;&#34;&#34;
+        pod.POD(): test default constructor.
+        &#34;&#34;&#34;
+        for ds in self.example_ds:
+            pod.POD(ds)
+
+    def test_selected_features(self):
+        &#34;&#34;&#34;
+        pod.POD(): test constructor with selected features.
+        &#34;&#34;&#34;
+        features = [f&#34;{i}&#34; for i in range(20)]
+        for ds in self.example_ds:
+            p = pod.POD(ds, features=features)
+            self.assertTrue(&#34;0&#34; in p.ds.features)
+            self.assertFalse(&#34;30&#34; in p.ds.features)
+
+    def test_wrong_feature(self):
+        &#34;&#34;&#34;
+        pod.POD(): test constructor with features not in data.
+        &#34;&#34;&#34;
+        for ds in self.example_ds:
+            with self.assertRaises(ValueError):
+                pod.POD(ds, features=[&#34;NOT&#34;, &#34;IN&#34;, &#34;DATA&#34;])
+
+    def test_selected_condition(self):
+        &#34;&#34;&#34;
+        pod.POD(): test constructor with selected condition.
+        &#34;&#34;&#34;
+        p = pod.POD(self.example_ds[2], conditions=[&#34;a&#34;])
+        self.assertTrue(&#34;a&#34; in p.ds.condition_list)
+        self.assertFalse(&#34;b&#34; in p.ds.condition_list)
+
+    def test_wrong_condition(self):
+        &#34;&#34;&#34;
+        pod.POD(): test constructor with condition not in data.
+        &#34;&#34;&#34;
+        with self.assertRaises(ValueError):
+            pod.POD(self.example_ds[2], conditions=[&#34;c&#34;])
+
+    def test_with_clustering(self):
+        &#34;&#34;&#34;
+        pod.POD(): test constructor with clustering (KMeans from sklearn).
+        &#34;&#34;&#34;
+        for ds in self.example_ds:
+            p = pod.POD(ds, cluster=cluster.KMeans(n_clusters=3, n_init=&#39;auto&#39;))
+            p = pod.POD(ds, cluster=cluster.KMeans(n_clusters=3, n_init=&#39;auto&#39;), cluster_components=2)
+
+
+class TestInterpolateSamples(TestCase):
+    &#34;&#34;&#34;
+    Test interpolation of sample weights.
+    &#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample=&#34;Sample&#34;)) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;)) )
+
+    def test_default_call(self):
+        &#34;&#34;&#34;
+        pod.POD.interpolate_sample_weights(): test default call.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            w = ex.interpolate_sample_weights()
+            self.assertEqual(len(set(w.index)), len(ex.ds.timepoints))
+
+    def test_selected_condition(self):
+        &#34;&#34;&#34;
+        pod.POD.interpolate_sample_weights(): test with only selected condition
+        &#34;&#34;&#34;
+        w = self.examples[2].interpolate_sample_weights(conditions=[&#39;a&#39;])
+        self.assertEqual(len(w.index), len(self.examples[2].ds.timepoints))
+        for wi, di in zip(w.index, self.examples[2].ds.timepoints):
+            self.assertEqual(wi,  di)
+
+    def test_wrong_condition(self):
+        &#34;&#34;&#34;
+        pod.POD.interpolate_sample_weights(): test with condition not in dataset
+        &#34;&#34;&#34;
+        with self.assertRaises(ValueError):
+            self.examples[2].interpolate_sample_weights(conditions=[&#34;c&#34;])
+
+    def test_selected_timepoints(self):
+        &#34;&#34;&#34;
+        pod.POD.interpolate_sample_weights(): test with subset of timepoints
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            timepoints = ex.ds.timepoints[:3]
+            w = ex.interpolate_sample_weights(timepoints=timepoints)
+            self.assertEqual(len(set(w.index)), len(timepoints))
+            if len(w.index) == len(timepoints):
+                for wi, ti in zip(w.index, timepoints):
+                    self.assertEqual(wi, ti)
+
+class TestComputeComponent(TestCase):
+    &#34;&#34;&#34;Test computation of component values.&#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample=&#34;Sample&#34;)) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;)) )
+
+    def test_compute_component(self):
+        &#34;&#34;&#34;
+        pod.POD.get_component(): testing component reconstruction.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            for i,s in enumerate(ex.sing_values):
+                d_test = ex.get_component(component=i)
+                U, S, Vt = linalg.svd(ex.ds.data[ex.features])
+                d_ref = np.atleast_2d(U[:,i]).T.dot(np.atleast_2d(Vt[i,:])) * S[i]
+                testing.assert_allclose(d_test[ex.features].to_numpy(), d_ref)
+
+class TestFeaturePlot(TestCase):
+    &#34;&#34;&#34;Test plotting of features in component space.&#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample=&#34;Sample&#34;), cluster=cluster.KMeans(n_clusters=3, n_init=&#39;auto&#39;), cluster_components=4) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;), cluster=cluster.KMeans(n_clusters=3, n_init=&#39;auto&#39;), cluster_components=4) )
+
+    def test_default_call(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_features(): test default call.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_features()
+            # testing with keyword argument
+            fig, ax = ex.plot_features(marker=&#39;o&#39;)
+
+    def test_with_labels(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_features(): test with labels.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_features(labels=&#39;clusters&#39;)
+
+    def test_with_annotation(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_features(): test with labels.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_features(annotate=True)
+
+    def test_feature_subset(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_features(): test plotting feature subset.        
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_features(labels=&#39;clusters&#39;, features=[&#39;0&#39;, &#39;49&#39;])
+        
+            
+class TestSamplePlot(TestCase):
+    &#34;&#34;&#34;Test plotting of samples in component space.&#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample=&#34;Sample&#34;)) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;)) )
+
+    def test_default_call(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_samples(): test default call.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_samples()
+            # testing with keyword argument
+            fig, ax = ex.plot_samples(marker=&#39;o&#39;)
+
+    def test_with_labels(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_samples(): test with labels.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_samples(labels=&#39;condition&#39;)
+            fig, ax = ex.plot_samples(labels=&#39;time&#39;)
+            fig, ax = ex.plot_samples(labels=&#39;both&#39;)
+            with self.assertRaises(ValueError):
+                ex.plot_samples(labels=&#39;&#39;)
+
+    def test_with_annotation(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_samples(): test with labels.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_samples(annotate=True)
+
+            
+class TestSampleWeightPlot(TestCase):
+    &#34;&#34;&#34;Test plotting of sample weights.&#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample=&#34;Sample&#34;)) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;)) )
+
+    def test_default_call(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_sample_weights(): test default call.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_sample_weights()
+
+    def test_with_interpolated(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_sample_weights(): test with conditions.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_sample_weights(interpolate=True)
+            </code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="podomics.tests.test_pod.TestComputeComponent"><code class="flex name class">
+<span>class <span class="ident">TestComputeComponent</span></span>
+<span>(</span><span>methodName='runTest')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Test computation of component values.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestComputeComponent(TestCase):
+    &#34;&#34;&#34;Test computation of component values.&#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample=&#34;Sample&#34;)) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;)) )
+
+    def test_compute_component(self):
+        &#34;&#34;&#34;
+        pod.POD.get_component(): testing component reconstruction.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            for i,s in enumerate(ex.sing_values):
+                d_test = ex.get_component(component=i)
+                U, S, Vt = linalg.svd(ex.ds.data[ex.features])
+                d_ref = np.atleast_2d(U[:,i]).T.dot(np.atleast_2d(Vt[i,:])) * S[i]
+                testing.assert_allclose(d_test[ex.features].to_numpy(), d_ref)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestComputeComponent.example_data"><code class="name">var <span class="ident">example_data</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="podomics.tests.test_pod.TestComputeComponent.examples"><code class="name">var <span class="ident">examples</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestComputeComponent.test_compute_component"><code class="name flex">
+<span>def <span class="ident">test_compute_component</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.get_component(): testing component reconstruction.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_compute_component(self):
+    &#34;&#34;&#34;
+    pod.POD.get_component(): testing component reconstruction.
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        for i,s in enumerate(ex.sing_values):
+            d_test = ex.get_component(component=i)
+            U, S, Vt = linalg.svd(ex.ds.data[ex.features])
+            d_ref = np.atleast_2d(U[:,i]).T.dot(np.atleast_2d(Vt[i,:])) * S[i]
+            testing.assert_allclose(d_test[ex.features].to_numpy(), d_ref)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="podomics.tests.test_pod.TestFeaturePlot"><code class="flex name class">
+<span>class <span class="ident">TestFeaturePlot</span></span>
+<span>(</span><span>methodName='runTest')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Test plotting of features in component space.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestFeaturePlot(TestCase):
+    &#34;&#34;&#34;Test plotting of features in component space.&#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample=&#34;Sample&#34;), cluster=cluster.KMeans(n_clusters=3, n_init=&#39;auto&#39;), cluster_components=4) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;), cluster=cluster.KMeans(n_clusters=3, n_init=&#39;auto&#39;), cluster_components=4) )
+
+    def test_default_call(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_features(): test default call.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_features()
+            # testing with keyword argument
+            fig, ax = ex.plot_features(marker=&#39;o&#39;)
+
+    def test_with_labels(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_features(): test with labels.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_features(labels=&#39;clusters&#39;)
+
+    def test_with_annotation(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_features(): test with labels.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_features(annotate=True)
+
+    def test_feature_subset(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_features(): test plotting feature subset.        
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_features(labels=&#39;clusters&#39;, features=[&#39;0&#39;, &#39;49&#39;])</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestFeaturePlot.example_data"><code class="name">var <span class="ident">example_data</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="podomics.tests.test_pod.TestFeaturePlot.examples"><code class="name">var <span class="ident">examples</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestFeaturePlot.test_default_call"><code class="name flex">
+<span>def <span class="ident">test_default_call</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.plot_features(): test default call.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_default_call(self):
+    &#34;&#34;&#34;
+    pod.POD.plot_features(): test default call.
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        fig, ax = ex.plot_features()
+        # testing with keyword argument
+        fig, ax = ex.plot_features(marker=&#39;o&#39;)</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestFeaturePlot.test_feature_subset"><code class="name flex">
+<span>def <span class="ident">test_feature_subset</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.plot_features(): test plotting feature subset.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_feature_subset(self):
+    &#34;&#34;&#34;
+    pod.POD.plot_features(): test plotting feature subset.        
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        fig, ax = ex.plot_features(labels=&#39;clusters&#39;, features=[&#39;0&#39;, &#39;49&#39;])</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestFeaturePlot.test_with_annotation"><code class="name flex">
+<span>def <span class="ident">test_with_annotation</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.plot_features(): test with labels.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_with_annotation(self):
+    &#34;&#34;&#34;
+    pod.POD.plot_features(): test with labels.
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        fig, ax = ex.plot_features(annotate=True)</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestFeaturePlot.test_with_labels"><code class="name flex">
+<span>def <span class="ident">test_with_labels</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.plot_features(): test with labels.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_with_labels(self):
+    &#34;&#34;&#34;
+    pod.POD.plot_features(): test with labels.
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        fig, ax = ex.plot_features(labels=&#39;clusters&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="podomics.tests.test_pod.TestInterpolateSamples"><code class="flex name class">
+<span>class <span class="ident">TestInterpolateSamples</span></span>
+<span>(</span><span>methodName='runTest')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Test interpolation of sample weights.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestInterpolateSamples(TestCase):
+    &#34;&#34;&#34;
+    Test interpolation of sample weights.
+    &#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample=&#34;Sample&#34;)) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;)) )
+
+    def test_default_call(self):
+        &#34;&#34;&#34;
+        pod.POD.interpolate_sample_weights(): test default call.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            w = ex.interpolate_sample_weights()
+            self.assertEqual(len(set(w.index)), len(ex.ds.timepoints))
+
+    def test_selected_condition(self):
+        &#34;&#34;&#34;
+        pod.POD.interpolate_sample_weights(): test with only selected condition
+        &#34;&#34;&#34;
+        w = self.examples[2].interpolate_sample_weights(conditions=[&#39;a&#39;])
+        self.assertEqual(len(w.index), len(self.examples[2].ds.timepoints))
+        for wi, di in zip(w.index, self.examples[2].ds.timepoints):
+            self.assertEqual(wi,  di)
+
+    def test_wrong_condition(self):
+        &#34;&#34;&#34;
+        pod.POD.interpolate_sample_weights(): test with condition not in dataset
+        &#34;&#34;&#34;
+        with self.assertRaises(ValueError):
+            self.examples[2].interpolate_sample_weights(conditions=[&#34;c&#34;])
+
+    def test_selected_timepoints(self):
+        &#34;&#34;&#34;
+        pod.POD.interpolate_sample_weights(): test with subset of timepoints
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            timepoints = ex.ds.timepoints[:3]
+            w = ex.interpolate_sample_weights(timepoints=timepoints)
+            self.assertEqual(len(set(w.index)), len(timepoints))
+            if len(w.index) == len(timepoints):
+                for wi, ti in zip(w.index, timepoints):
+                    self.assertEqual(wi, ti)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestInterpolateSamples.example_data"><code class="name">var <span class="ident">example_data</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="podomics.tests.test_pod.TestInterpolateSamples.examples"><code class="name">var <span class="ident">examples</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestInterpolateSamples.test_default_call"><code class="name flex">
+<span>def <span class="ident">test_default_call</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.interpolate_sample_weights(): test default call.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_default_call(self):
+    &#34;&#34;&#34;
+    pod.POD.interpolate_sample_weights(): test default call.
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        w = ex.interpolate_sample_weights()
+        self.assertEqual(len(set(w.index)), len(ex.ds.timepoints))</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestInterpolateSamples.test_selected_condition"><code class="name flex">
+<span>def <span class="ident">test_selected_condition</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.interpolate_sample_weights(): test with only selected condition</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_selected_condition(self):
+    &#34;&#34;&#34;
+    pod.POD.interpolate_sample_weights(): test with only selected condition
+    &#34;&#34;&#34;
+    w = self.examples[2].interpolate_sample_weights(conditions=[&#39;a&#39;])
+    self.assertEqual(len(w.index), len(self.examples[2].ds.timepoints))
+    for wi, di in zip(w.index, self.examples[2].ds.timepoints):
+        self.assertEqual(wi,  di)</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestInterpolateSamples.test_selected_timepoints"><code class="name flex">
+<span>def <span class="ident">test_selected_timepoints</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.interpolate_sample_weights(): test with subset of timepoints</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_selected_timepoints(self):
+    &#34;&#34;&#34;
+    pod.POD.interpolate_sample_weights(): test with subset of timepoints
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        timepoints = ex.ds.timepoints[:3]
+        w = ex.interpolate_sample_weights(timepoints=timepoints)
+        self.assertEqual(len(set(w.index)), len(timepoints))
+        if len(w.index) == len(timepoints):
+            for wi, ti in zip(w.index, timepoints):
+                self.assertEqual(wi, ti)</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestInterpolateSamples.test_wrong_condition"><code class="name flex">
+<span>def <span class="ident">test_wrong_condition</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.interpolate_sample_weights(): test with condition not in dataset</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_wrong_condition(self):
+    &#34;&#34;&#34;
+    pod.POD.interpolate_sample_weights(): test with condition not in dataset
+    &#34;&#34;&#34;
+    with self.assertRaises(ValueError):
+        self.examples[2].interpolate_sample_weights(conditions=[&#34;c&#34;])</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="podomics.tests.test_pod.TestRunPOD"><code class="flex name class">
+<span>class <span class="ident">TestRunPOD</span></span>
+<span>(</span><span>methodName='runTest')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Test constructor for POD class</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestRunPOD(TestCase):
+    &#34;&#34;&#34;
+    Test constructor for POD class
+    &#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    example_ds = [dataset.read_csv(f, sample=&#34;Sample&#34;) for f in example_data[:2]]
+    example_ds.append( dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;) )
+
+    def test_default_call(self):
+        &#34;&#34;&#34;
+        pod.POD(): test default constructor.
+        &#34;&#34;&#34;
+        for ds in self.example_ds:
+            pod.POD(ds)
+
+    def test_selected_features(self):
+        &#34;&#34;&#34;
+        pod.POD(): test constructor with selected features.
+        &#34;&#34;&#34;
+        features = [f&#34;{i}&#34; for i in range(20)]
+        for ds in self.example_ds:
+            p = pod.POD(ds, features=features)
+            self.assertTrue(&#34;0&#34; in p.ds.features)
+            self.assertFalse(&#34;30&#34; in p.ds.features)
+
+    def test_wrong_feature(self):
+        &#34;&#34;&#34;
+        pod.POD(): test constructor with features not in data.
+        &#34;&#34;&#34;
+        for ds in self.example_ds:
+            with self.assertRaises(ValueError):
+                pod.POD(ds, features=[&#34;NOT&#34;, &#34;IN&#34;, &#34;DATA&#34;])
+
+    def test_selected_condition(self):
+        &#34;&#34;&#34;
+        pod.POD(): test constructor with selected condition.
+        &#34;&#34;&#34;
+        p = pod.POD(self.example_ds[2], conditions=[&#34;a&#34;])
+        self.assertTrue(&#34;a&#34; in p.ds.condition_list)
+        self.assertFalse(&#34;b&#34; in p.ds.condition_list)
+
+    def test_wrong_condition(self):
+        &#34;&#34;&#34;
+        pod.POD(): test constructor with condition not in data.
+        &#34;&#34;&#34;
+        with self.assertRaises(ValueError):
+            pod.POD(self.example_ds[2], conditions=[&#34;c&#34;])
+
+    def test_with_clustering(self):
+        &#34;&#34;&#34;
+        pod.POD(): test constructor with clustering (KMeans from sklearn).
+        &#34;&#34;&#34;
+        for ds in self.example_ds:
+            p = pod.POD(ds, cluster=cluster.KMeans(n_clusters=3, n_init=&#39;auto&#39;))
+            p = pod.POD(ds, cluster=cluster.KMeans(n_clusters=3, n_init=&#39;auto&#39;), cluster_components=2)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestRunPOD.example_data"><code class="name">var <span class="ident">example_data</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="podomics.tests.test_pod.TestRunPOD.example_ds"><code class="name">var <span class="ident">example_ds</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestRunPOD.test_default_call"><code class="name flex">
+<span>def <span class="ident">test_default_call</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD(): test default constructor.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_default_call(self):
+    &#34;&#34;&#34;
+    pod.POD(): test default constructor.
+    &#34;&#34;&#34;
+    for ds in self.example_ds:
+        pod.POD(ds)</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestRunPOD.test_selected_condition"><code class="name flex">
+<span>def <span class="ident">test_selected_condition</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD(): test constructor with selected condition.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_selected_condition(self):
+    &#34;&#34;&#34;
+    pod.POD(): test constructor with selected condition.
+    &#34;&#34;&#34;
+    p = pod.POD(self.example_ds[2], conditions=[&#34;a&#34;])
+    self.assertTrue(&#34;a&#34; in p.ds.condition_list)
+    self.assertFalse(&#34;b&#34; in p.ds.condition_list)</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestRunPOD.test_selected_features"><code class="name flex">
+<span>def <span class="ident">test_selected_features</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD(): test constructor with selected features.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_selected_features(self):
+    &#34;&#34;&#34;
+    pod.POD(): test constructor with selected features.
+    &#34;&#34;&#34;
+    features = [f&#34;{i}&#34; for i in range(20)]
+    for ds in self.example_ds:
+        p = pod.POD(ds, features=features)
+        self.assertTrue(&#34;0&#34; in p.ds.features)
+        self.assertFalse(&#34;30&#34; in p.ds.features)</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestRunPOD.test_with_clustering"><code class="name flex">
+<span>def <span class="ident">test_with_clustering</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD(): test constructor with clustering (KMeans from sklearn).</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_with_clustering(self):
+    &#34;&#34;&#34;
+    pod.POD(): test constructor with clustering (KMeans from sklearn).
+    &#34;&#34;&#34;
+    for ds in self.example_ds:
+        p = pod.POD(ds, cluster=cluster.KMeans(n_clusters=3, n_init=&#39;auto&#39;))
+        p = pod.POD(ds, cluster=cluster.KMeans(n_clusters=3, n_init=&#39;auto&#39;), cluster_components=2)</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestRunPOD.test_wrong_condition"><code class="name flex">
+<span>def <span class="ident">test_wrong_condition</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD(): test constructor with condition not in data.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_wrong_condition(self):
+    &#34;&#34;&#34;
+    pod.POD(): test constructor with condition not in data.
+    &#34;&#34;&#34;
+    with self.assertRaises(ValueError):
+        pod.POD(self.example_ds[2], conditions=[&#34;c&#34;])</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestRunPOD.test_wrong_feature"><code class="name flex">
+<span>def <span class="ident">test_wrong_feature</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD(): test constructor with features not in data.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_wrong_feature(self):
+    &#34;&#34;&#34;
+    pod.POD(): test constructor with features not in data.
+    &#34;&#34;&#34;
+    for ds in self.example_ds:
+        with self.assertRaises(ValueError):
+            pod.POD(ds, features=[&#34;NOT&#34;, &#34;IN&#34;, &#34;DATA&#34;])</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="podomics.tests.test_pod.TestSamplePlot"><code class="flex name class">
+<span>class <span class="ident">TestSamplePlot</span></span>
+<span>(</span><span>methodName='runTest')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Test plotting of samples in component space.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestSamplePlot(TestCase):
+    &#34;&#34;&#34;Test plotting of samples in component space.&#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample=&#34;Sample&#34;)) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;)) )
+
+    def test_default_call(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_samples(): test default call.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_samples()
+            # testing with keyword argument
+            fig, ax = ex.plot_samples(marker=&#39;o&#39;)
+
+    def test_with_labels(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_samples(): test with labels.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_samples(labels=&#39;condition&#39;)
+            fig, ax = ex.plot_samples(labels=&#39;time&#39;)
+            fig, ax = ex.plot_samples(labels=&#39;both&#39;)
+            with self.assertRaises(ValueError):
+                ex.plot_samples(labels=&#39;&#39;)
+
+    def test_with_annotation(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_samples(): test with labels.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_samples(annotate=True)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestSamplePlot.example_data"><code class="name">var <span class="ident">example_data</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="podomics.tests.test_pod.TestSamplePlot.examples"><code class="name">var <span class="ident">examples</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestSamplePlot.test_default_call"><code class="name flex">
+<span>def <span class="ident">test_default_call</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.plot_samples(): test default call.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_default_call(self):
+    &#34;&#34;&#34;
+    pod.POD.plot_samples(): test default call.
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        fig, ax = ex.plot_samples()
+        # testing with keyword argument
+        fig, ax = ex.plot_samples(marker=&#39;o&#39;)</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestSamplePlot.test_with_annotation"><code class="name flex">
+<span>def <span class="ident">test_with_annotation</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.plot_samples(): test with labels.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_with_annotation(self):
+    &#34;&#34;&#34;
+    pod.POD.plot_samples(): test with labels.
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        fig, ax = ex.plot_samples(annotate=True)</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestSamplePlot.test_with_labels"><code class="name flex">
+<span>def <span class="ident">test_with_labels</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.plot_samples(): test with labels.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_with_labels(self):
+    &#34;&#34;&#34;
+    pod.POD.plot_samples(): test with labels.
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        fig, ax = ex.plot_samples(labels=&#39;condition&#39;)
+        fig, ax = ex.plot_samples(labels=&#39;time&#39;)
+        fig, ax = ex.plot_samples(labels=&#39;both&#39;)
+        with self.assertRaises(ValueError):
+            ex.plot_samples(labels=&#39;&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="podomics.tests.test_pod.TestSampleWeightPlot"><code class="flex name class">
+<span>class <span class="ident">TestSampleWeightPlot</span></span>
+<span>(</span><span>methodName='runTest')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Test plotting of sample weights.</p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestSampleWeightPlot(TestCase):
+    &#34;&#34;&#34;Test plotting of sample weights.&#34;&#34;&#34;
+    example_data = [f&#34;examples/exampledata{i+1}.csv&#34; for i in range(3)]
+    examples = [pod.POD(dataset.read_csv(f, sample=&#34;Sample&#34;)) for f in example_data[:2]]
+    examples.append( pod.POD(dataset.read_csv(example_data[2], sample=&#34;Sample&#34;, condition=&#34;Condition&#34;)) )
+
+    def test_default_call(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_sample_weights(): test default call.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_sample_weights()
+
+    def test_with_interpolated(self):
+        &#34;&#34;&#34;
+        pod.POD.plot_sample_weights(): test with conditions.
+        &#34;&#34;&#34;
+        for ex in self.examples:
+            fig, ax = ex.plot_sample_weights(interpolate=True)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>unittest.case.TestCase</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestSampleWeightPlot.example_data"><code class="name">var <span class="ident">example_data</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="podomics.tests.test_pod.TestSampleWeightPlot.examples"><code class="name">var <span class="ident">examples</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="podomics.tests.test_pod.TestSampleWeightPlot.test_default_call"><code class="name flex">
+<span>def <span class="ident">test_default_call</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.plot_sample_weights(): test default call.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_default_call(self):
+    &#34;&#34;&#34;
+    pod.POD.plot_sample_weights(): test default call.
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        fig, ax = ex.plot_sample_weights()</code></pre>
+</details>
+</dd>
+<dt id="podomics.tests.test_pod.TestSampleWeightPlot.test_with_interpolated"><code class="name flex">
+<span>def <span class="ident">test_with_interpolated</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>pod.POD.plot_sample_weights(): test with conditions.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_with_interpolated(self):
+    &#34;&#34;&#34;
+    pod.POD.plot_sample_weights(): test with conditions.
+    &#34;&#34;&#34;
+    for ex in self.examples:
+        fig, ax = ex.plot_sample_weights(interpolate=True)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="podomics.tests" href="index.html">podomics.tests</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="podomics.tests.test_pod.TestComputeComponent" href="#podomics.tests.test_pod.TestComputeComponent">TestComputeComponent</a></code></h4>
+<ul class="">
+<li><code><a title="podomics.tests.test_pod.TestComputeComponent.example_data" href="#podomics.tests.test_pod.TestComputeComponent.example_data">example_data</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestComputeComponent.examples" href="#podomics.tests.test_pod.TestComputeComponent.examples">examples</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestComputeComponent.test_compute_component" href="#podomics.tests.test_pod.TestComputeComponent.test_compute_component">test_compute_component</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="podomics.tests.test_pod.TestFeaturePlot" href="#podomics.tests.test_pod.TestFeaturePlot">TestFeaturePlot</a></code></h4>
+<ul class="">
+<li><code><a title="podomics.tests.test_pod.TestFeaturePlot.example_data" href="#podomics.tests.test_pod.TestFeaturePlot.example_data">example_data</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestFeaturePlot.examples" href="#podomics.tests.test_pod.TestFeaturePlot.examples">examples</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestFeaturePlot.test_default_call" href="#podomics.tests.test_pod.TestFeaturePlot.test_default_call">test_default_call</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestFeaturePlot.test_feature_subset" href="#podomics.tests.test_pod.TestFeaturePlot.test_feature_subset">test_feature_subset</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestFeaturePlot.test_with_annotation" href="#podomics.tests.test_pod.TestFeaturePlot.test_with_annotation">test_with_annotation</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestFeaturePlot.test_with_labels" href="#podomics.tests.test_pod.TestFeaturePlot.test_with_labels">test_with_labels</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="podomics.tests.test_pod.TestInterpolateSamples" href="#podomics.tests.test_pod.TestInterpolateSamples">TestInterpolateSamples</a></code></h4>
+<ul class="">
+<li><code><a title="podomics.tests.test_pod.TestInterpolateSamples.example_data" href="#podomics.tests.test_pod.TestInterpolateSamples.example_data">example_data</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestInterpolateSamples.examples" href="#podomics.tests.test_pod.TestInterpolateSamples.examples">examples</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestInterpolateSamples.test_default_call" href="#podomics.tests.test_pod.TestInterpolateSamples.test_default_call">test_default_call</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestInterpolateSamples.test_selected_condition" href="#podomics.tests.test_pod.TestInterpolateSamples.test_selected_condition">test_selected_condition</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestInterpolateSamples.test_selected_timepoints" href="#podomics.tests.test_pod.TestInterpolateSamples.test_selected_timepoints">test_selected_timepoints</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestInterpolateSamples.test_wrong_condition" href="#podomics.tests.test_pod.TestInterpolateSamples.test_wrong_condition">test_wrong_condition</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="podomics.tests.test_pod.TestRunPOD" href="#podomics.tests.test_pod.TestRunPOD">TestRunPOD</a></code></h4>
+<ul class="">
+<li><code><a title="podomics.tests.test_pod.TestRunPOD.example_data" href="#podomics.tests.test_pod.TestRunPOD.example_data">example_data</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestRunPOD.example_ds" href="#podomics.tests.test_pod.TestRunPOD.example_ds">example_ds</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestRunPOD.test_default_call" href="#podomics.tests.test_pod.TestRunPOD.test_default_call">test_default_call</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestRunPOD.test_selected_condition" href="#podomics.tests.test_pod.TestRunPOD.test_selected_condition">test_selected_condition</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestRunPOD.test_selected_features" href="#podomics.tests.test_pod.TestRunPOD.test_selected_features">test_selected_features</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestRunPOD.test_with_clustering" href="#podomics.tests.test_pod.TestRunPOD.test_with_clustering">test_with_clustering</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestRunPOD.test_wrong_condition" href="#podomics.tests.test_pod.TestRunPOD.test_wrong_condition">test_wrong_condition</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestRunPOD.test_wrong_feature" href="#podomics.tests.test_pod.TestRunPOD.test_wrong_feature">test_wrong_feature</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="podomics.tests.test_pod.TestSamplePlot" href="#podomics.tests.test_pod.TestSamplePlot">TestSamplePlot</a></code></h4>
+<ul class="">
+<li><code><a title="podomics.tests.test_pod.TestSamplePlot.example_data" href="#podomics.tests.test_pod.TestSamplePlot.example_data">example_data</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestSamplePlot.examples" href="#podomics.tests.test_pod.TestSamplePlot.examples">examples</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestSamplePlot.test_default_call" href="#podomics.tests.test_pod.TestSamplePlot.test_default_call">test_default_call</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestSamplePlot.test_with_annotation" href="#podomics.tests.test_pod.TestSamplePlot.test_with_annotation">test_with_annotation</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestSamplePlot.test_with_labels" href="#podomics.tests.test_pod.TestSamplePlot.test_with_labels">test_with_labels</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="podomics.tests.test_pod.TestSampleWeightPlot" href="#podomics.tests.test_pod.TestSampleWeightPlot">TestSampleWeightPlot</a></code></h4>
+<ul class="">
+<li><code><a title="podomics.tests.test_pod.TestSampleWeightPlot.example_data" href="#podomics.tests.test_pod.TestSampleWeightPlot.example_data">example_data</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestSampleWeightPlot.examples" href="#podomics.tests.test_pod.TestSampleWeightPlot.examples">examples</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestSampleWeightPlot.test_default_call" href="#podomics.tests.test_pod.TestSampleWeightPlot.test_default_call">test_default_call</a></code></li>
+<li><code><a title="podomics.tests.test_pod.TestSampleWeightPlot.test_with_interpolated" href="#podomics.tests.test_pod.TestSampleWeightPlot.test_with_interpolated">test_with_interpolated</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.1</a>.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad()</script>
+</body>
+</html>
