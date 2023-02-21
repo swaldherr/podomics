@@ -7,6 +7,10 @@ podomics is a Python package to do proper orthogonal decomposition (POD) on larg
 Currently there is no installation method.
 Put the `podomics` directory into the working directory of your scripts / notebooks.
 
+Alternatively you can test the package on [Binder](https://mybinder.org):
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/swaldherr/podomics.git/binder)
+
 ### Documentation ###
 
 Documentation is currently accessible at:
