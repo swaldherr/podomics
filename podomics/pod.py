@@ -551,7 +551,7 @@ To plot a single condition in a previously created Axes:
     def plot_feature_trajectories(self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=False, clusters=None, labels=False, **kwargs):
         """Plot trajectories of individual features in component space.
 
-Arguments
+Parameters
 ---
 conditions : list of str, default=None
     List of conditions to plot.
@@ -610,18 +610,48 @@ Example usage
         if new_fig:
             return fig, ax
         
-    def plot_feature_data_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, annotate=None, **kwargs):
-        """Plot feature trajectories in given Axes.
+    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+        """Plot feature trajectories within the component space to given Axes.
 
-Plot data from a single condition.
-Plot only selected clusters.
+This method can only be used to plot raw data points for a single condition into a provided matplotlib Axes.
+Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
+
+See also
+---
+Other methods to plot interpolated trajectory / plot multiple conditions
+
+Parameters
+---
+ax : Matplotlib Axes
+    Axes to plot into.
+components : tuple of int, default=(0,1)
+    Components to consider for plotting. 
+    First element refer to the component weights to use for x-values, second element to the weights to use for y-values.
+features : list of str, default=None
+    List of features to include in the plot.
+    If `None`, plot all features.
+condition : str, default=None
+    Identifier of the condition to plot.
+    By default the first of the known conditions is plotted.
+clusters : list of int, default=None
+    List of cluster identifiers to include in the plot, default is all clusters.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib annotate method.
+    To label only selected features, pass the identifiers of the desired features as list.
+labels : str, default=None
+    Which labels to assign for a possible plot legend. By default, no labels are assigned.
+    With `labels='clusters'`, labels according to the cluster numbers are assigned.
+    With `labels='condition'`, labels according to the condition identifier are assigned.
+    If plotting in a given Axes, the legend has to be activated separately.
+**kwargs : dict
+    Additional arguments are passed to matplotlib's plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle '.' is used.
 
 Example usage
 ---
     >>> from matplotlib import pyplot
     >>> fig, ax = pyplot.subplots(1, 1)
     >>> pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
-    >>> pod_result.plot_feature_data_in(ax)
+    >>> pod_result.plot_feature_trajectory_in(ax, annotate=True)
 """
         conditions = self._check_conditions(condition)
         condition = conditions[0] if conditions is not None else None
@@ -635,20 +665,44 @@ Example usage
         else:
             fs = features
         # features = np.asarray(features)
+        if clusters is None and self.cluster is not None:
+            clusters = list(set(self.labels))
         if clusters is not None and self.cluster is not None:
-            features = [f for f,l in zip(self.features, self.labels) if f in fs and l in clusters]
+            fc = [(f,l) for f,l in zip(self.features, self.labels) if f in fs and l in clusters]
+            features = [f for f,l in fc]
+            clusters = [l for f,l in fc]
         else:
             features = fs
-        labelled = False
-        for f in features:
-            if condition is not None and not labelled:
-                ax.plot(df0[f], df1[f], '.', label=f"{self.ds.condition} {condition}", **kwargs)
-                labelled = True
+        labelled = dict()
+        for i,f in enumerate(features):
+            label = None
+            color = None
+            if condition is not None and labels == 'condition':
+                if condition not in labelled:
+                    label = f"{self.ds.condition} {condition}"
+                    labelled[condition] = None
+                else:
+                    color = labelled[condition].get_color()
+            if self.cluster is not None and labels == 'cluster':
+                if clusters[i] not in labelled:
+                    label = f"Cluster {clusters[i]}"
+                    labelled[clusters[i]] = None
+                else:
+                    color = labelled[clusters[i]].get_color()
+            if len(kwargs):
+                plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
             else:
-                ax.plot(df0[f], df1[f], '.', **kwargs)
-            if annotate is not None:
-                for a in annotate:
-                    ax.annotate(f, (df0.loc[a,f], df1.loc[a,f]) )
+                plot, = ax.plot(df0[f], df1[f], '.', label=label, color=color)
+            if label is not None:
+                if labels == 'condition':
+                    labelled[condition] = plot
+                if labels == 'cluster':
+                    labelled[clusters[i]] = plot
+        if annotate is not False:
+            if annotate is True:
+                annotate = features
+            for a in annotate:
+                ax.annotate(a, (df0[a][0], df1[a][0]) )
 
 
     def _check_conditions(self, conditions):
