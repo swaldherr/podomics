@@ -2,20 +2,16 @@
 
 podomics is a Python package to do proper orthogonal decomposition (POD) on large-scale timeseries datasets such as from timeseries omics experiments.
 
-### What is this repository for? ###
+### Installation instructions ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+Currently there is no installation method.
+Put the `podomics` directory into the working directory of your scripts / notebooks.
 
-### How do I get set up? ###
+### Documentation ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+Documentation is currently accessible at:
+
+https://swaldherr.github.io/podomics/podomics
 
 ### Developer guidelines ###
 
