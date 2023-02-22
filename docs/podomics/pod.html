@@ -575,14 +575,17 @@ To plot a single condition in a previously created Axes:
         &#34;&#34;&#34;Plot data reconstruction
         &#34;&#34;&#34;
 
-    def plot_feature_trajectories(self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=None, clusters=None, labels=False, annotate=False, **kwargs):
+    def plot_feature_trajectories(self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=None, timepoints=None, clusters=None, labels=False, annotate=False):
         &#34;&#34;&#34;Plot trajectories of individual features in component space.
 
-Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
+Convenience method to plot raw data and interpolated trajectories in a joint figure.
 
-See also
----
-Other methods to plot interpolated trajectory / plot multiple conditions
+.. note:: Similar functions
+    The following functions can generate parts of this plot, but will allow finer control over plot options:
+    
+    * `POD.plot_feature_trajectory_in()` : use to plot raw data for a single condition in an externally created Axes.
+    * `POD.plot_feature_interpolation_in()`: use to plot only interpolated trajectory for a single condition in an externally created Axes.
+
 
 Parameters
 ---
@@ -602,23 +605,24 @@ interpolate : str, default=None
     What type of interpolated trajectory to plot.
     By default, only the raw data is plotted.
     See `POD.interpolate_sample_weights()` for available interpolation methods.
+timepoints : list of timestamps
+    Time points for which to produce interpolation results.
+    Only relevant if interpolated trajectory is plotted.
 clusters : list of int, default=None
     List of cluster identifiers to include in the plot, default is all clusters.
-annotate : Boolean or list of feature identifiers, default=False
-    Label the data points in the plot with the feature names, using the matplotlib annotate method.
-    To label only selected features, pass the identifiers of the desired features as list.
 labels : str, default=None
     Which labels to assign for a possible plot legend. By default, no labels are assigned.
     With `labels=&#39;clusters&#39;`, labels according to the cluster numbers are assigned.
     With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
     If plotting in a given Axes, the legend has to be activated separately.
-**kwargs : dict
-    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle &#39;.&#39; is used.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib annotate method.
+    To label only selected features, pass the identifiers of the desired features as list.
 
 Returns
 ---
-fig : Matplotlib `Figure`
-ax : Matplotlib `Axes`
+fig : matplotlib Figure
+ax : matplotlib Axes
 
 Example usage
 ---
@@ -627,62 +631,35 @@ Example usage
         &#34;&#34;&#34;
         conditions = self._check_conditions(conditions)
         if ax is None:
-            if conditions is not None:
-                fig, axs = pyplot.subplots(1, len(conditions))
-            else:
-                fig, ax = pyplot.subplots(1, 1)
-                axs = [ax,]
-            for i, ax in enumerate(axs):
-                ax.set_xlabel(f&#34;Component #{components[0]}&#34;)
-                if conditions is not None:
-                    ax.set_title(f&#34;{self.ds.condition} {conditions[i]}&#34;)
-            axs[0].set_ylabel(f&#34;Component #{components[1]}&#34;)
+            fig, ax = pyplot.subplots(1, 1)
+            ax.set_xlabel(f&#34;Component #{components[0]}&#34;)
+            ax.set_ylabel(f&#34;Component #{components[1]}&#34;)
             new_fig = True
         else:
-            axs = [ax,]
             new_fig = False
 
-        if features is None:
-            features = self.features
-            feature_index = np.array(range(len(self.features)))
-        else:
-            feature_index = np.array([self.features.index(f) for f in features])
+        if interpolate is not None:
+            interpolation = self.interpolate_sample_weights(interpolation=interpolate, conditions=conditions, timepoints=timepoints)
 
-        if conditions is not None:
-            weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
-        else:
-            weights = self.sample_weights
-        if interpolate is not False:
-            method = interpolate if isinstance(interpolate, str) else &#39;average&#39;
-            interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+        if conditions is None:
+            conditions = [None,]
+        for c in conditions:
+            annotate_this = False if interpolate is not None else annotate
+            artists = self.plot_feature_trajectory_in(ax, components=components, features=features, condition=c, clusters=clusters, labels=labels, annotate=annotate_this)
+            if interpolate is not None:
+                colors = dict([(f, artists[f].get_color()) for f in artists])
+                self.plot_feature_interpolation_in(ax, interpolation, components=components, features=features, condition=c, clusters=clusters, labels=labels, annotate=annotate, plotcolors=colors)
+        if labels is not None:
+            ax.legend()
 
-        for f, fi in zip(features, feature_index):
-            if conditions is not None:
-                for i,c in enumerate(conditions):
-                    traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
-                    traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
-            else:
-                traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
-                traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
-                axs[0].plot(traj0, traj1, &#39;.&#39;, **kwargs)
-
-        # if False: #self.cluster is not None:
-        #     for l in set(self.labels):
-        #         ax.plot(self.feature_weights[feature_index[self.labels==l], components[0]], self.feature_weights[feature_index[self.labels==l], components[1]], &#39;.&#39;)
-        # else:
-        #     ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], &#39;.&#39;)
         if new_fig:
             return fig, ax
         
-    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, plotcolors={}, **kwargs):
         &#34;&#34;&#34;Plot feature trajectories within the component space to given Axes.
 
 This method can only be used to plot raw data points for a single condition into a provided matplotlib Axes.
 Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
-
-See also
----
-Other methods to plot interpolated trajectory / plot multiple conditions
 
 Parameters
 ---
@@ -699,23 +676,34 @@ condition : str, default=None
     By default the first of the known conditions is plotted.
 clusters : list of int, default=None
     List of cluster identifiers to include in the plot, default is all clusters.
-annotate : Boolean or list of feature identifiers, default=False
-    Label the data points in the plot with the feature names, using the matplotlib annotate method.
-    To label only selected features, pass the identifiers of the desired features as list.
 labels : str, default=None
     Which labels to assign for a possible plot legend. By default, no labels are assigned.
     With `labels=&#39;cluster&#39;`, labels according to the cluster numbers are assigned.
     With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
     If plotting in a given Axes, the legend has to be activated separately.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib annotate method.
+    To label only selected features, pass the identifiers of the desired features as list.
+plotcolors : dict, default={}
+    Dictionary of color specifiers for matplotlib with feature identifiers as keys.
+    Can be used to define plot color per feature.
+    By default the default color cycle of matplotlib will be used.
+    Note that if a color specification is given as an additional keyword argument, that specification takes priority and overrides the value given in this argument!
 **kwargs : dict
-    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle &#39;.&#39; is used.
+    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle &#39;.&#39; is used.
+
+Returns
+---
+artists : dict
+    Dictionary of plot elements (`matplotlib.lines.Line2D`) keyed by feature identifiers.
 
 Example usage
 ---
     &gt;&gt;&gt; from matplotlib import pyplot
     &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
     &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
-    &gt;&gt;&gt; pod_result.plot_feature_trajectory_in(ax, annotate=True)
+    &gt;&gt;&gt; artists = pod_result.plot_feature_trajectory_in(ax, annotate=True)
 &#34;&#34;&#34;
         conditions = self._check_conditions(condition)
         condition = conditions[0] if conditions is not None else None
@@ -738,6 +726,7 @@ Example usage
         else:
             features = fs
         labelled = dict()
+        artists = dict()
         for i,f in enumerate(features):
             label = None
             color = None
@@ -753,10 +742,16 @@ Example usage
                     labelled[clusters[i]] = None
                 else:
                     color = labelled[clusters[i]].get_color()
+            if f in plotcolors:
+                color = plotcolors[f]
             if len(kwargs):
-                plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
+                if &#39;color&#39; in kwargs or &#39;c&#39; in kwargs or color is None:
+                    plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
+                else:
+                    plot, = ax.plot(df0[f], df1[f], label=label, color=color, **kwargs)
             else:
                 plot, = ax.plot(df0[f], df1[f], &#39;.&#39;, label=label, color=color)
+            artists[f] = plot
             if label is not None:
                 if labels == &#39;condition&#39;:
                     labelled[condition] = plot
@@ -767,17 +762,14 @@ Example usage
                 annotate = features
             for a in annotate:
                 ax.annotate(a, (df0[a][0], df1[a][0]) )
+        return artists
 
 
-    def plot_feature_interpolation_in(self, ax, interpolation, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+    def plot_feature_interpolation_in(self, ax, interpolation, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, plotcolors={}, **kwargs):
         &#34;&#34;&#34;Plot interpolated feature trajectories within the component space to given Axes.
 
 This method can only be used to plot interpolated feature trajectories for a single condition into a provided matplotlib Axes.
 Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
-
-See also
----
-Other methods to plot interpolated trajectory / plot multiple conditions
 
 Parameters
 ---
@@ -804,8 +796,18 @@ labels : str, default=None
     With `labels=&#39;cluster&#39;`, labels according to the cluster numbers are assigned.
     With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
     Note that the legend is not shown by this method, but has to be activated externally by calling `ax.legend()` or similar after running this method.
+plotcolors : dict, default={}
+    Dictionary of color specifiers for matplotlib with feature identifiers as keys.
+    Can be used to define plot color per feature.
+    By default the default color cycle of matplotlib will be used.
+    Note that if a color specification is given as an additional keyword argument, that specification takes priority and overrides the value given in this argument!
 **kwargs : dict
     Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc.
+
+Returns
+---
+artists : dict
+    Dictionary of plot elements (`matplotlib.lines.Line2D`) keyed by feature identifiers.
 
 Example usage
 ---
@@ -813,7 +815,15 @@ Example usage
     &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
     &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
     &gt;&gt;&gt; interpolation = pod_result.interpolate_sample_weights()
-    &gt;&gt;&gt; pod_result.plot_feature_interpolation_in(ax, interpolation)
+    &gt;&gt;&gt; _ = pod_result.plot_feature_interpolation_in(ax, interpolation)
+
+Often we want raw data points and the interpolated trajectory to use the same colors for the same features.
+That can be achieved as follows:
+
+    &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
+    &gt;&gt;&gt; artists = pod_result.plot_feature_trajectory_in(ax)
+    &gt;&gt;&gt; colors = dict([(f, artists[f].get_color()) for f in pod_result.features])
+    &gt;&gt;&gt; _ = pod_result.plot_feature_interpolation_in(ax, interpolation, plotcolors=colors)
 &#34;&#34;&#34;
         conditions = self._check_conditions(condition)
         condition = conditions[0] if conditions is not None else None
@@ -836,6 +846,7 @@ Example usage
         else:
             features = fs
         labelled = dict()
+        artists = dict()
         for i,f in enumerate(features):
             label = None
             color = None
@@ -851,6 +862,8 @@ Example usage
                     labelled[clusters[i]] = None
                 else:
                     color = labelled[clusters[i]].get_color()
+            if f in plotcolors:
+                color = plotcolors[f]
             fi = self.features.index(f)
             x = self.sing_values[components[0]] * phi0 * self.feature_weights[fi, components[0]]
             y = self.sing_values[components[1]] * phi1 * self.feature_weights[fi, components[1]]
@@ -858,6 +871,7 @@ Example usage
                 plot, = ax.plot(x, y, label=label, **kwargs)
             else:
                 plot, = ax.plot(x, y, label=label, color=color, **kwargs)
+            artists[f] = plot
             if label is not None:
                 if labels == &#39;condition&#39;:
                     labelled[condition] = plot
@@ -866,6 +880,7 @@ Example usage
             if annotate is not False:
                 if annotate is True or f in annotate:
                     ax.annotate(f, (x[0], y[0]))
+        return artists
 
 
     def _check_conditions(self, conditions):
@@ -1508,14 +1523,17 @@ To plot a single condition in a previously created Axes:
         &#34;&#34;&#34;Plot data reconstruction
         &#34;&#34;&#34;
 
-    def plot_feature_trajectories(self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=None, clusters=None, labels=False, annotate=False, **kwargs):
+    def plot_feature_trajectories(self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=None, timepoints=None, clusters=None, labels=False, annotate=False):
         &#34;&#34;&#34;Plot trajectories of individual features in component space.
 
-Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
+Convenience method to plot raw data and interpolated trajectories in a joint figure.
 
-See also
----
-Other methods to plot interpolated trajectory / plot multiple conditions
+.. note:: Similar functions
+    The following functions can generate parts of this plot, but will allow finer control over plot options:
+    
+    * `POD.plot_feature_trajectory_in()` : use to plot raw data for a single condition in an externally created Axes.
+    * `POD.plot_feature_interpolation_in()`: use to plot only interpolated trajectory for a single condition in an externally created Axes.
+
 
 Parameters
 ---
@@ -1535,23 +1553,24 @@ interpolate : str, default=None
     What type of interpolated trajectory to plot.
     By default, only the raw data is plotted.
     See `POD.interpolate_sample_weights()` for available interpolation methods.
+timepoints : list of timestamps
+    Time points for which to produce interpolation results.
+    Only relevant if interpolated trajectory is plotted.
 clusters : list of int, default=None
     List of cluster identifiers to include in the plot, default is all clusters.
-annotate : Boolean or list of feature identifiers, default=False
-    Label the data points in the plot with the feature names, using the matplotlib annotate method.
-    To label only selected features, pass the identifiers of the desired features as list.
 labels : str, default=None
     Which labels to assign for a possible plot legend. By default, no labels are assigned.
     With `labels=&#39;clusters&#39;`, labels according to the cluster numbers are assigned.
     With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
     If plotting in a given Axes, the legend has to be activated separately.
-**kwargs : dict
-    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle &#39;.&#39; is used.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib annotate method.
+    To label only selected features, pass the identifiers of the desired features as list.
 
 Returns
 ---
-fig : Matplotlib `Figure`
-ax : Matplotlib `Axes`
+fig : matplotlib Figure
+ax : matplotlib Axes
 
 Example usage
 ---
@@ -1560,62 +1579,35 @@ Example usage
         &#34;&#34;&#34;
         conditions = self._check_conditions(conditions)
         if ax is None:
-            if conditions is not None:
-                fig, axs = pyplot.subplots(1, len(conditions))
-            else:
-                fig, ax = pyplot.subplots(1, 1)
-                axs = [ax,]
-            for i, ax in enumerate(axs):
-                ax.set_xlabel(f&#34;Component #{components[0]}&#34;)
-                if conditions is not None:
-                    ax.set_title(f&#34;{self.ds.condition} {conditions[i]}&#34;)
-            axs[0].set_ylabel(f&#34;Component #{components[1]}&#34;)
+            fig, ax = pyplot.subplots(1, 1)
+            ax.set_xlabel(f&#34;Component #{components[0]}&#34;)
+            ax.set_ylabel(f&#34;Component #{components[1]}&#34;)
             new_fig = True
         else:
-            axs = [ax,]
             new_fig = False
 
-        if features is None:
-            features = self.features
-            feature_index = np.array(range(len(self.features)))
-        else:
-            feature_index = np.array([self.features.index(f) for f in features])
+        if interpolate is not None:
+            interpolation = self.interpolate_sample_weights(interpolation=interpolate, conditions=conditions, timepoints=timepoints)
 
-        if conditions is not None:
-            weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
-        else:
-            weights = self.sample_weights
-        if interpolate is not False:
-            method = interpolate if isinstance(interpolate, str) else &#39;average&#39;
-            interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+        if conditions is None:
+            conditions = [None,]
+        for c in conditions:
+            annotate_this = False if interpolate is not None else annotate
+            artists = self.plot_feature_trajectory_in(ax, components=components, features=features, condition=c, clusters=clusters, labels=labels, annotate=annotate_this)
+            if interpolate is not None:
+                colors = dict([(f, artists[f].get_color()) for f in artists])
+                self.plot_feature_interpolation_in(ax, interpolation, components=components, features=features, condition=c, clusters=clusters, labels=labels, annotate=annotate, plotcolors=colors)
+        if labels is not None:
+            ax.legend()
 
-        for f, fi in zip(features, feature_index):
-            if conditions is not None:
-                for i,c in enumerate(conditions):
-                    traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
-                    traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
-            else:
-                traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
-                traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
-                axs[0].plot(traj0, traj1, &#39;.&#39;, **kwargs)
-
-        # if False: #self.cluster is not None:
-        #     for l in set(self.labels):
-        #         ax.plot(self.feature_weights[feature_index[self.labels==l], components[0]], self.feature_weights[feature_index[self.labels==l], components[1]], &#39;.&#39;)
-        # else:
-        #     ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], &#39;.&#39;)
         if new_fig:
             return fig, ax
         
-    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, plotcolors={}, **kwargs):
         &#34;&#34;&#34;Plot feature trajectories within the component space to given Axes.
 
 This method can only be used to plot raw data points for a single condition into a provided matplotlib Axes.
 Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
-
-See also
----
-Other methods to plot interpolated trajectory / plot multiple conditions
 
 Parameters
 ---
@@ -1632,23 +1624,34 @@ condition : str, default=None
     By default the first of the known conditions is plotted.
 clusters : list of int, default=None
     List of cluster identifiers to include in the plot, default is all clusters.
-annotate : Boolean or list of feature identifiers, default=False
-    Label the data points in the plot with the feature names, using the matplotlib annotate method.
-    To label only selected features, pass the identifiers of the desired features as list.
 labels : str, default=None
     Which labels to assign for a possible plot legend. By default, no labels are assigned.
     With `labels=&#39;cluster&#39;`, labels according to the cluster numbers are assigned.
     With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
     If plotting in a given Axes, the legend has to be activated separately.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib annotate method.
+    To label only selected features, pass the identifiers of the desired features as list.
+plotcolors : dict, default={}
+    Dictionary of color specifiers for matplotlib with feature identifiers as keys.
+    Can be used to define plot color per feature.
+    By default the default color cycle of matplotlib will be used.
+    Note that if a color specification is given as an additional keyword argument, that specification takes priority and overrides the value given in this argument!
 **kwargs : dict
-    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle &#39;.&#39; is used.
+    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle &#39;.&#39; is used.
+
+Returns
+---
+artists : dict
+    Dictionary of plot elements (`matplotlib.lines.Line2D`) keyed by feature identifiers.
 
 Example usage
 ---
     &gt;&gt;&gt; from matplotlib import pyplot
     &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
     &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
-    &gt;&gt;&gt; pod_result.plot_feature_trajectory_in(ax, annotate=True)
+    &gt;&gt;&gt; artists = pod_result.plot_feature_trajectory_in(ax, annotate=True)
 &#34;&#34;&#34;
         conditions = self._check_conditions(condition)
         condition = conditions[0] if conditions is not None else None
@@ -1671,6 +1674,7 @@ Example usage
         else:
             features = fs
         labelled = dict()
+        artists = dict()
         for i,f in enumerate(features):
             label = None
             color = None
@@ -1686,10 +1690,16 @@ Example usage
                     labelled[clusters[i]] = None
                 else:
                     color = labelled[clusters[i]].get_color()
+            if f in plotcolors:
+                color = plotcolors[f]
             if len(kwargs):
-                plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
+                if &#39;color&#39; in kwargs or &#39;c&#39; in kwargs or color is None:
+                    plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
+                else:
+                    plot, = ax.plot(df0[f], df1[f], label=label, color=color, **kwargs)
             else:
                 plot, = ax.plot(df0[f], df1[f], &#39;.&#39;, label=label, color=color)
+            artists[f] = plot
             if label is not None:
                 if labels == &#39;condition&#39;:
                     labelled[condition] = plot
@@ -1700,17 +1710,14 @@ Example usage
                 annotate = features
             for a in annotate:
                 ax.annotate(a, (df0[a][0], df1[a][0]) )
+        return artists
 
 
-    def plot_feature_interpolation_in(self, ax, interpolation, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+    def plot_feature_interpolation_in(self, ax, interpolation, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, plotcolors={}, **kwargs):
         &#34;&#34;&#34;Plot interpolated feature trajectories within the component space to given Axes.
 
 This method can only be used to plot interpolated feature trajectories for a single condition into a provided matplotlib Axes.
 Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
-
-See also
----
-Other methods to plot interpolated trajectory / plot multiple conditions
 
 Parameters
 ---
@@ -1737,8 +1744,18 @@ labels : str, default=None
     With `labels=&#39;cluster&#39;`, labels according to the cluster numbers are assigned.
     With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
     Note that the legend is not shown by this method, but has to be activated externally by calling `ax.legend()` or similar after running this method.
+plotcolors : dict, default={}
+    Dictionary of color specifiers for matplotlib with feature identifiers as keys.
+    Can be used to define plot color per feature.
+    By default the default color cycle of matplotlib will be used.
+    Note that if a color specification is given as an additional keyword argument, that specification takes priority and overrides the value given in this argument!
 **kwargs : dict
     Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc.
+
+Returns
+---
+artists : dict
+    Dictionary of plot elements (`matplotlib.lines.Line2D`) keyed by feature identifiers.
 
 Example usage
 ---
@@ -1746,7 +1763,15 @@ Example usage
     &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
     &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
     &gt;&gt;&gt; interpolation = pod_result.interpolate_sample_weights()
-    &gt;&gt;&gt; pod_result.plot_feature_interpolation_in(ax, interpolation)
+    &gt;&gt;&gt; _ = pod_result.plot_feature_interpolation_in(ax, interpolation)
+
+Often we want raw data points and the interpolated trajectory to use the same colors for the same features.
+That can be achieved as follows:
+
+    &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
+    &gt;&gt;&gt; artists = pod_result.plot_feature_trajectory_in(ax)
+    &gt;&gt;&gt; colors = dict([(f, artists[f].get_color()) for f in pod_result.features])
+    &gt;&gt;&gt; _ = pod_result.plot_feature_interpolation_in(ax, interpolation, plotcolors=colors)
 &#34;&#34;&#34;
         conditions = self._check_conditions(condition)
         condition = conditions[0] if conditions is not None else None
@@ -1769,6 +1794,7 @@ Example usage
         else:
             features = fs
         labelled = dict()
+        artists = dict()
         for i,f in enumerate(features):
             label = None
             color = None
@@ -1784,6 +1810,8 @@ Example usage
                     labelled[clusters[i]] = None
                 else:
                     color = labelled[clusters[i]].get_color()
+            if f in plotcolors:
+                color = plotcolors[f]
             fi = self.features.index(f)
             x = self.sing_values[components[0]] * phi0 * self.feature_weights[fi, components[0]]
             y = self.sing_values[components[1]] * phi1 * self.feature_weights[fi, components[1]]
@@ -1791,6 +1819,7 @@ Example usage
                 plot, = ax.plot(x, y, label=label, **kwargs)
             else:
                 plot, = ax.plot(x, y, label=label, color=color, **kwargs)
+            artists[f] = plot
             if label is not None:
                 if labels == &#39;condition&#39;:
                     labelled[condition] = plot
@@ -1799,6 +1828,7 @@ Example usage
             if annotate is not False:
                 if annotate is True or f in annotate:
                     ax.annotate(f, (x[0], y[0]))
+        return artists
 
 
     def _check_conditions(self, conditions):
@@ -2007,14 +2037,12 @@ Example usage
 </details>
 </dd>
 <dt id="podomics.pod.POD.plot_feature_interpolation_in"><code class="name flex">
-<span>def <span class="ident">plot_feature_interpolation_in</span></span>(<span>self, ax, interpolation, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs)</span>
+<span>def <span class="ident">plot_feature_interpolation_in</span></span>(<span>self, ax, interpolation, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, plotcolors={}, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Plot interpolated feature trajectories within the component space to given Axes.</p>
 <p>This method can only be used to plot interpolated feature trajectories for a single condition into a provided matplotlib Axes.
 Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.</p>
-<h2 id="see-also">See Also</h2>
-<p><code>Other methods to plot interpolated trajectory / plot multiple conditions</code></p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Matplotlib Axes</code></dt>
@@ -2040,29 +2068,42 @@ To label only selected features, pass the identifiers of the desired features as
 With <code>labels='cluster'</code>, labels according to the cluster numbers are assigned.
 With <code>labels='condition'</code>, labels according to the condition identifier are assigned.
 Note that the legend is not shown by this method, but has to be activated externally by calling <code>ax.legend()</code> or similar after running this method.</dd>
+<dt><strong><code>plotcolors</code></strong> :&ensp;<code>dict</code>, default=<code>{}</code></dt>
+<dd>Dictionary of color specifiers for matplotlib with feature identifiers as keys.
+Can be used to define plot color per feature.
+By default the default color cycle of matplotlib will be used.
+Note that if a color specification is given as an additional keyword argument, that specification takes priority and overrides the value given in this argument!</dd>
 <dt><strong><code>**kwargs</code></strong> :&ensp;<code>dict</code></dt>
 <dd>Additional arguments are passed to matplotlib's plot function and can be used to change the plot style etc.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>artists</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Dictionary of plot elements (<code>matplotlib.lines.Line2D</code>) keyed by feature identifiers.</dd>
 </dl>
 <h2 id="example-usage">Example Usage</h2>
 <pre><code>&gt;&gt;&gt; from matplotlib import pyplot
 &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
 &gt;&gt;&gt; pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
 &gt;&gt;&gt; interpolation = pod_result.interpolate_sample_weights()
-&gt;&gt;&gt; pod_result.plot_feature_interpolation_in(ax, interpolation)
+&gt;&gt;&gt; _ = pod_result.plot_feature_interpolation_in(ax, interpolation)
+</code></pre>
+<p>Often we want raw data points and the interpolated trajectory to use the same colors for the same features.
+That can be achieved as follows:</p>
+<pre><code>&gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
+&gt;&gt;&gt; artists = pod_result.plot_feature_trajectory_in(ax)
+&gt;&gt;&gt; colors = dict([(f, artists[f].get_color()) for f in pod_result.features])
+&gt;&gt;&gt; _ = pod_result.plot_feature_interpolation_in(ax, interpolation, plotcolors=colors)
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">    def plot_feature_interpolation_in(self, ax, interpolation, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+<pre><code class="python">    def plot_feature_interpolation_in(self, ax, interpolation, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, plotcolors={}, **kwargs):
         &#34;&#34;&#34;Plot interpolated feature trajectories within the component space to given Axes.
 
 This method can only be used to plot interpolated feature trajectories for a single condition into a provided matplotlib Axes.
 Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
-
-See also
----
-Other methods to plot interpolated trajectory / plot multiple conditions
 
 Parameters
 ---
@@ -2089,8 +2130,18 @@ labels : str, default=None
     With `labels=&#39;cluster&#39;`, labels according to the cluster numbers are assigned.
     With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
     Note that the legend is not shown by this method, but has to be activated externally by calling `ax.legend()` or similar after running this method.
+plotcolors : dict, default={}
+    Dictionary of color specifiers for matplotlib with feature identifiers as keys.
+    Can be used to define plot color per feature.
+    By default the default color cycle of matplotlib will be used.
+    Note that if a color specification is given as an additional keyword argument, that specification takes priority and overrides the value given in this argument!
 **kwargs : dict
     Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc.
+
+Returns
+---
+artists : dict
+    Dictionary of plot elements (`matplotlib.lines.Line2D`) keyed by feature identifiers.
 
 Example usage
 ---
@@ -2098,7 +2149,15 @@ Example usage
     &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
     &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
     &gt;&gt;&gt; interpolation = pod_result.interpolate_sample_weights()
-    &gt;&gt;&gt; pod_result.plot_feature_interpolation_in(ax, interpolation)
+    &gt;&gt;&gt; _ = pod_result.plot_feature_interpolation_in(ax, interpolation)
+
+Often we want raw data points and the interpolated trajectory to use the same colors for the same features.
+That can be achieved as follows:
+
+    &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
+    &gt;&gt;&gt; artists = pod_result.plot_feature_trajectory_in(ax)
+    &gt;&gt;&gt; colors = dict([(f, artists[f].get_color()) for f in pod_result.features])
+    &gt;&gt;&gt; _ = pod_result.plot_feature_interpolation_in(ax, interpolation, plotcolors=colors)
 &#34;&#34;&#34;
         conditions = self._check_conditions(condition)
         condition = conditions[0] if conditions is not None else None
@@ -2121,6 +2180,7 @@ Example usage
         else:
             features = fs
         labelled = dict()
+        artists = dict()
         for i,f in enumerate(features):
             label = None
             color = None
@@ -2136,6 +2196,8 @@ Example usage
                     labelled[clusters[i]] = None
                 else:
                     color = labelled[clusters[i]].get_color()
+            if f in plotcolors:
+                color = plotcolors[f]
             fi = self.features.index(f)
             x = self.sing_values[components[0]] * phi0 * self.feature_weights[fi, components[0]]
             y = self.sing_values[components[1]] * phi1 * self.feature_weights[fi, components[1]]
@@ -2143,6 +2205,7 @@ Example usage
                 plot, = ax.plot(x, y, label=label, **kwargs)
             else:
                 plot, = ax.plot(x, y, label=label, color=color, **kwargs)
+            artists[f] = plot
             if label is not None:
                 if labels == &#39;condition&#39;:
                     labelled[condition] = plot
@@ -2150,17 +2213,24 @@ Example usage
                     labelled[clusters[i]] = plot
             if annotate is not False:
                 if annotate is True or f in annotate:
-                    ax.annotate(f, (x[0], y[0]))</code></pre>
+                    ax.annotate(f, (x[0], y[0]))
+        return artists</code></pre>
 </details>
 </dd>
 <dt id="podomics.pod.POD.plot_feature_trajectories"><code class="name flex">
-<span>def <span class="ident">plot_feature_trajectories</span></span>(<span>self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=None, clusters=None, labels=False, annotate=False, **kwargs)</span>
+<span>def <span class="ident">plot_feature_trajectories</span></span>(<span>self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=None, timepoints=None, clusters=None, labels=False, annotate=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Plot trajectories of individual features in component space.</p>
-<p>Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.</p>
-<h2 id="see-also">See Also</h2>
-<p><code>Other methods to plot interpolated trajectory / plot multiple conditions</code></p>
+<p>Convenience method to plot raw data and interpolated trajectories in a joint figure.</p>
+<div class="admonition note">
+<p class="admonition-title">Note:&ensp;Similar functions</p>
+<p>The following functions can generate parts of this plot, but will allow finer control over plot options:</p>
+<ul>
+<li><code><a title="podomics.pod.POD.plot_feature_trajectory_in" href="#podomics.pod.POD.plot_feature_trajectory_in">POD.plot_feature_trajectory_in()</a></code> : use to plot raw data for a single condition in an externally created Axes.</li>
+<li><code><a title="podomics.pod.POD.plot_feature_interpolation_in" href="#podomics.pod.POD.plot_feature_interpolation_in">POD.plot_feature_interpolation_in()</a></code>: use to plot only interpolated trajectory for a single condition in an externally created Axes.</li>
+</ul>
+</div>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Matplotlib Axes</code>, default=<code>None</code></dt>
@@ -2179,24 +2249,25 @@ If <code>None</code>, plot all features.</dd>
 <dd>What type of interpolated trajectory to plot.
 By default, only the raw data is plotted.
 See <code><a title="podomics.pod.POD.interpolate_sample_weights" href="#podomics.pod.POD.interpolate_sample_weights">POD.interpolate_sample_weights()</a></code> for available interpolation methods.</dd>
+<dt><strong><code>timepoints</code></strong> :&ensp;<code>list</code> of <code>timestamps</code></dt>
+<dd>Time points for which to produce interpolation results.
+Only relevant if interpolated trajectory is plotted.</dd>
 <dt><strong><code>clusters</code></strong> :&ensp;<code>list</code> of <code>int</code>, default=<code>None</code></dt>
 <dd>List of cluster identifiers to include in the plot, default is all clusters.</dd>
-<dt><strong><code>annotate</code></strong> :&ensp;<code>Boolean</code> or <code>list</code> of <code>feature identifiers</code>, default=<code>False</code></dt>
-<dd>Label the data points in the plot with the feature names, using the matplotlib annotate method.
-To label only selected features, pass the identifiers of the desired features as list.</dd>
 <dt><strong><code>labels</code></strong> :&ensp;<code>str</code>, default=<code>None</code></dt>
 <dd>Which labels to assign for a possible plot legend. By default, no labels are assigned.
 With <code>labels='clusters'</code>, labels according to the cluster numbers are assigned.
 With <code>labels='condition'</code>, labels according to the condition identifier are assigned.
 If plotting in a given Axes, the legend has to be activated separately.</dd>
-<dt><strong><code>**kwargs</code></strong> :&ensp;<code>dict</code></dt>
-<dd>Additional arguments are passed to matplotlib's plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle '.' is used.</dd>
+<dt><strong><code>annotate</code></strong> :&ensp;<code>Boolean</code> or <code>list</code> of <code>feature identifiers</code>, default=<code>False</code></dt>
+<dd>Label the data points in the plot with the feature names, using the matplotlib annotate method.
+To label only selected features, pass the identifiers of the desired features as list.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><strong><code>fig</code></strong> :&ensp;<code>Matplotlib </code>Figure``</dt>
+<dt><strong><code>fig</code></strong> :&ensp;<code>matplotlib Figure</code></dt>
 <dd>&nbsp;</dd>
-<dt><strong><code>ax</code></strong> :&ensp;<code>Matplotlib </code>Axes``</dt>
+<dt><strong><code>ax</code></strong> :&ensp;<code>matplotlib Axes</code></dt>
 <dd>&nbsp;</dd>
 </dl>
 <h2 id="example-usage">Example Usage</h2>
@@ -2207,14 +2278,17 @@ If plotting in a given Axes, the legend has to be activated separately.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">    def plot_feature_trajectories(self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=None, clusters=None, labels=False, annotate=False, **kwargs):
+<pre><code class="python">    def plot_feature_trajectories(self, ax=None, components=(0, 1), conditions=None, features=None, interpolate=None, timepoints=None, clusters=None, labels=False, annotate=False):
         &#34;&#34;&#34;Plot trajectories of individual features in component space.
 
-Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
+Convenience method to plot raw data and interpolated trajectories in a joint figure.
 
-See also
----
-Other methods to plot interpolated trajectory / plot multiple conditions
+.. note:: Similar functions
+    The following functions can generate parts of this plot, but will allow finer control over plot options:
+    
+    * `POD.plot_feature_trajectory_in()` : use to plot raw data for a single condition in an externally created Axes.
+    * `POD.plot_feature_interpolation_in()`: use to plot only interpolated trajectory for a single condition in an externally created Axes.
+
 
 Parameters
 ---
@@ -2234,23 +2308,24 @@ interpolate : str, default=None
     What type of interpolated trajectory to plot.
     By default, only the raw data is plotted.
     See `POD.interpolate_sample_weights()` for available interpolation methods.
+timepoints : list of timestamps
+    Time points for which to produce interpolation results.
+    Only relevant if interpolated trajectory is plotted.
 clusters : list of int, default=None
     List of cluster identifiers to include in the plot, default is all clusters.
-annotate : Boolean or list of feature identifiers, default=False
-    Label the data points in the plot with the feature names, using the matplotlib annotate method.
-    To label only selected features, pass the identifiers of the desired features as list.
 labels : str, default=None
     Which labels to assign for a possible plot legend. By default, no labels are assigned.
     With `labels=&#39;clusters&#39;`, labels according to the cluster numbers are assigned.
     With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
     If plotting in a given Axes, the legend has to be activated separately.
-**kwargs : dict
-    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle &#39;.&#39; is used.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib annotate method.
+    To label only selected features, pass the identifiers of the desired features as list.
 
 Returns
 ---
-fig : Matplotlib `Figure`
-ax : Matplotlib `Axes`
+fig : matplotlib Figure
+ax : matplotlib Axes
 
 Example usage
 ---
@@ -2259,63 +2334,38 @@ Example usage
         &#34;&#34;&#34;
         conditions = self._check_conditions(conditions)
         if ax is None:
-            if conditions is not None:
-                fig, axs = pyplot.subplots(1, len(conditions))
-            else:
-                fig, ax = pyplot.subplots(1, 1)
-                axs = [ax,]
-            for i, ax in enumerate(axs):
-                ax.set_xlabel(f&#34;Component #{components[0]}&#34;)
-                if conditions is not None:
-                    ax.set_title(f&#34;{self.ds.condition} {conditions[i]}&#34;)
-            axs[0].set_ylabel(f&#34;Component #{components[1]}&#34;)
+            fig, ax = pyplot.subplots(1, 1)
+            ax.set_xlabel(f&#34;Component #{components[0]}&#34;)
+            ax.set_ylabel(f&#34;Component #{components[1]}&#34;)
             new_fig = True
         else:
-            axs = [ax,]
             new_fig = False
 
-        if features is None:
-            features = self.features
-            feature_index = np.array(range(len(self.features)))
-        else:
-            feature_index = np.array([self.features.index(f) for f in features])
+        if interpolate is not None:
+            interpolation = self.interpolate_sample_weights(interpolation=interpolate, conditions=conditions, timepoints=timepoints)
 
-        if conditions is not None:
-            weights = self.sample_weights[self.sample_weights[self.ds.condition].isin(conditions)]
-        else:
-            weights = self.sample_weights
-        if interpolate is not False:
-            method = interpolate if isinstance(interpolate, str) else &#39;average&#39;
-            interp_weights = self.interpolate_sample_weights(interpolation=method, conditions=conditions)
+        if conditions is None:
+            conditions = [None,]
+        for c in conditions:
+            annotate_this = False if interpolate is not None else annotate
+            artists = self.plot_feature_trajectory_in(ax, components=components, features=features, condition=c, clusters=clusters, labels=labels, annotate=annotate_this)
+            if interpolate is not None:
+                colors = dict([(f, artists[f].get_color()) for f in artists])
+                self.plot_feature_interpolation_in(ax, interpolation, components=components, features=features, condition=c, clusters=clusters, labels=labels, annotate=annotate, plotcolors=colors)
+        if labels is not None:
+            ax.legend()
 
-        for f, fi in zip(features, feature_index):
-            if conditions is not None:
-                for i,c in enumerate(conditions):
-                    traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
-                    traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
-            else:
-                traj0 = self.sample_weights[components[0]] * self.feature_weights[fi, components[0]] * self.sing_values[components[0]]
-                traj1 = self.sample_weights[components[1]] * self.feature_weights[fi, components[1]] * self.sing_values[components[1]]
-                axs[0].plot(traj0, traj1, &#39;.&#39;, **kwargs)
-
-        # if False: #self.cluster is not None:
-        #     for l in set(self.labels):
-        #         ax.plot(self.feature_weights[feature_index[self.labels==l], components[0]], self.feature_weights[feature_index[self.labels==l], components[1]], &#39;.&#39;)
-        # else:
-        #     ax.plot(self.feature_weights[feature_index, components[0]], self.feature_weights[feature_index, components[1]], &#39;.&#39;)
         if new_fig:
             return fig, ax</code></pre>
 </details>
 </dd>
 <dt id="podomics.pod.POD.plot_feature_trajectory_in"><code class="name flex">
-<span>def <span class="ident">plot_feature_trajectory_in</span></span>(<span>self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs)</span>
+<span>def <span class="ident">plot_feature_trajectory_in</span></span>(<span>self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, plotcolors={}, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Plot feature trajectories within the component space to given Axes.</p>
 <p>This method can only be used to plot raw data points for a single condition into a provided matplotlib Axes.
 Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.</p>
-<h2 id="see-also">See Also</h2>
-<p><code>Other methods to plot interpolated trajectory / plot multiple conditions</code></p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>ax</code></strong> :&ensp;<code>Matplotlib Axes</code></dt>
@@ -2331,36 +2381,43 @@ If <code>None</code>, plot all features.</dd>
 By default the first of the known conditions is plotted.</dd>
 <dt><strong><code>clusters</code></strong> :&ensp;<code>list</code> of <code>int</code>, default=<code>None</code></dt>
 <dd>List of cluster identifiers to include in the plot, default is all clusters.</dd>
-<dt><strong><code>annotate</code></strong> :&ensp;<code>Boolean</code> or <code>list</code> of <code>feature identifiers</code>, default=<code>False</code></dt>
-<dd>Label the data points in the plot with the feature names, using the matplotlib annotate method.
-To label only selected features, pass the identifiers of the desired features as list.</dd>
 <dt><strong><code>labels</code></strong> :&ensp;<code>str</code>, default=<code>None</code></dt>
 <dd>Which labels to assign for a possible plot legend. By default, no labels are assigned.
 With <code>labels='cluster'</code>, labels according to the cluster numbers are assigned.
 With <code>labels='condition'</code>, labels according to the condition identifier are assigned.
 If plotting in a given Axes, the legend has to be activated separately.</dd>
+<dt><strong><code>annotate</code></strong> :&ensp;<code>Boolean</code> or <code>list</code> of <code>feature identifiers</code>, default=<code>False</code></dt>
+<dd>Label the data points in the plot with the feature names, using the matplotlib annotate method.
+To label only selected features, pass the identifiers of the desired features as list.</dd>
+<dt><strong><code>plotcolors</code></strong> :&ensp;<code>dict</code>, default=<code>{}</code></dt>
+<dd>Dictionary of color specifiers for matplotlib with feature identifiers as keys.
+Can be used to define plot color per feature.
+By default the default color cycle of matplotlib will be used.
+Note that if a color specification is given as an additional keyword argument, that specification takes priority and overrides the value given in this argument!</dd>
 <dt><strong><code>**kwargs</code></strong> :&ensp;<code>dict</code></dt>
-<dd>Additional arguments are passed to matplotlib's plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle '.' is used.</dd>
+<dd>Additional arguments are passed to matplotlib's plot function and can be used to change the plot style etc.
+If no arguments are given, the plotstyle '.' is used.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><strong><code>artists</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Dictionary of plot elements (<code>matplotlib.lines.Line2D</code>) keyed by feature identifiers.</dd>
 </dl>
 <h2 id="example-usage">Example Usage</h2>
 <pre><code>&gt;&gt;&gt; from matplotlib import pyplot
 &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
 &gt;&gt;&gt; pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
-&gt;&gt;&gt; pod_result.plot_feature_trajectory_in(ax, annotate=True)
+&gt;&gt;&gt; artists = pod_result.plot_feature_trajectory_in(ax, annotate=True)
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+<pre><code class="python">    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, plotcolors={}, **kwargs):
         &#34;&#34;&#34;Plot feature trajectories within the component space to given Axes.
 
 This method can only be used to plot raw data points for a single condition into a provided matplotlib Axes.
 Labels can be assigned to plot elements either for the condition or for the cluster, but a legend has to be created externally by the appropriate matplotlib method.
-
-See also
----
-Other methods to plot interpolated trajectory / plot multiple conditions
 
 Parameters
 ---
@@ -2377,23 +2434,34 @@ condition : str, default=None
     By default the first of the known conditions is plotted.
 clusters : list of int, default=None
     List of cluster identifiers to include in the plot, default is all clusters.
-annotate : Boolean or list of feature identifiers, default=False
-    Label the data points in the plot with the feature names, using the matplotlib annotate method.
-    To label only selected features, pass the identifiers of the desired features as list.
 labels : str, default=None
     Which labels to assign for a possible plot legend. By default, no labels are assigned.
     With `labels=&#39;cluster&#39;`, labels according to the cluster numbers are assigned.
     With `labels=&#39;condition&#39;`, labels according to the condition identifier are assigned.
     If plotting in a given Axes, the legend has to be activated separately.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib annotate method.
+    To label only selected features, pass the identifiers of the desired features as list.
+plotcolors : dict, default={}
+    Dictionary of color specifiers for matplotlib with feature identifiers as keys.
+    Can be used to define plot color per feature.
+    By default the default color cycle of matplotlib will be used.
+    Note that if a color specification is given as an additional keyword argument, that specification takes priority and overrides the value given in this argument!
 **kwargs : dict
-    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle &#39;.&#39; is used.
+    Additional arguments are passed to matplotlib&#39;s plot function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle &#39;.&#39; is used.
+
+Returns
+---
+artists : dict
+    Dictionary of plot elements (`matplotlib.lines.Line2D`) keyed by feature identifiers.
 
 Example usage
 ---
     &gt;&gt;&gt; from matplotlib import pyplot
     &gt;&gt;&gt; fig, ax = pyplot.subplots(1, 1)
     &gt;&gt;&gt; pod_result = POD(dataset.read_csv(&#34;examples/exampledata1.csv&#34;, sample=&#34;Sample&#34;))
-    &gt;&gt;&gt; pod_result.plot_feature_trajectory_in(ax, annotate=True)
+    &gt;&gt;&gt; artists = pod_result.plot_feature_trajectory_in(ax, annotate=True)
 &#34;&#34;&#34;
         conditions = self._check_conditions(condition)
         condition = conditions[0] if conditions is not None else None
@@ -2416,6 +2484,7 @@ Example usage
         else:
             features = fs
         labelled = dict()
+        artists = dict()
         for i,f in enumerate(features):
             label = None
             color = None
@@ -2431,10 +2500,16 @@ Example usage
                     labelled[clusters[i]] = None
                 else:
                     color = labelled[clusters[i]].get_color()
+            if f in plotcolors:
+                color = plotcolors[f]
             if len(kwargs):
-                plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
+                if &#39;color&#39; in kwargs or &#39;c&#39; in kwargs or color is None:
+                    plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
+                else:
+                    plot, = ax.plot(df0[f], df1[f], label=label, color=color, **kwargs)
             else:
                 plot, = ax.plot(df0[f], df1[f], &#39;.&#39;, label=label, color=color)
+            artists[f] = plot
             if label is not None:
                 if labels == &#39;condition&#39;:
                     labelled[condition] = plot
@@ -2444,7 +2519,8 @@ Example usage
             if annotate is True:
                 annotate = features
             for a in annotate:
-                ax.annotate(a, (df0[a][0], df1[a][0]) )</code></pre>
+                ax.annotate(a, (df0[a][0], df1[a][0]) )
+        return artists</code></pre>
 </details>
 </dd>
 <dt id="podomics.pod.POD.plot_features"><code class="name flex">
