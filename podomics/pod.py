@@ -610,7 +610,7 @@ Example usage
         if new_fig:
             return fig, ax
         
-    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+    def plot_feature_trajectory_in(self, ax, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, plotcolors={}, **kwargs):
         """Plot feature trajectories within the component space to given Axes.
 
 This method can only be used to plot raw data points for a single condition into a provided matplotlib Axes.
@@ -635,23 +635,34 @@ condition : str, default=None
     By default the first of the known conditions is plotted.
 clusters : list of int, default=None
     List of cluster identifiers to include in the plot, default is all clusters.
-annotate : Boolean or list of feature identifiers, default=False
-    Label the data points in the plot with the feature names, using the matplotlib annotate method.
-    To label only selected features, pass the identifiers of the desired features as list.
 labels : str, default=None
     Which labels to assign for a possible plot legend. By default, no labels are assigned.
     With `labels='cluster'`, labels according to the cluster numbers are assigned.
     With `labels='condition'`, labels according to the condition identifier are assigned.
     If plotting in a given Axes, the legend has to be activated separately.
+annotate : Boolean or list of feature identifiers, default=False
+    Label the data points in the plot with the feature names, using the matplotlib annotate method.
+    To label only selected features, pass the identifiers of the desired features as list.
+plotcolors : dict, default={}
+    Dictionary of color specifiers for matplotlib with feature identifiers as keys.
+    Can be used to define plot color per feature.
+    By default the default color cycle of matplotlib will be used.
+    Note that if a color specification is given as an additional keyword argument, that specification takes priority and overrides the value given in this argument!
 **kwargs : dict
-    Additional arguments are passed to matplotlib's plot function and can be used to change the plot style etc. If no arguments are given, the plotstyle '.' is used.
+    Additional arguments are passed to matplotlib's plot function and can be used to change the plot style etc.
+    If no arguments are given, the plotstyle '.' is used.
+
+Returns
+---
+artists : dict
+    Dictionary of plot elements (`matplotlib.lines.Line2D`) keyed by feature identifiers.
 
 Example usage
 ---
     >>> from matplotlib import pyplot
     >>> fig, ax = pyplot.subplots(1, 1)
     >>> pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
-    >>> pod_result.plot_feature_trajectory_in(ax, annotate=True)
+    >>> artists = pod_result.plot_feature_trajectory_in(ax, annotate=True)
 """
         conditions = self._check_conditions(condition)
         condition = conditions[0] if conditions is not None else None
@@ -674,6 +685,7 @@ Example usage
         else:
             features = fs
         labelled = dict()
+        artists = dict()
         for i,f in enumerate(features):
             label = None
             color = None
@@ -689,10 +701,16 @@ Example usage
                     labelled[clusters[i]] = None
                 else:
                     color = labelled[clusters[i]].get_color()
+            if f in plotcolors:
+                color = plotcolors[f]
             if len(kwargs):
-                plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
+                if 'color' in kwargs or 'c' in kwargs or color is None:
+                    plot, = ax.plot(df0[f], df1[f], label=label, **kwargs)
+                else:
+                    plot, = ax.plot(df0[f], df1[f], label=label, color=color, **kwargs)
             else:
                 plot, = ax.plot(df0[f], df1[f], '.', label=label, color=color)
+            artists[f] = plot
             if label is not None:
                 if labels == 'condition':
                     labelled[condition] = plot
@@ -703,9 +721,10 @@ Example usage
                 annotate = features
             for a in annotate:
                 ax.annotate(a, (df0[a][0], df1[a][0]) )
+        return artists
 
 
-    def plot_feature_interpolation_in(self, ax, interpolation, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, **kwargs):
+    def plot_feature_interpolation_in(self, ax, interpolation, components=(0, 1), features=None, condition=None, clusters=None, labels=None, annotate=False, plotcolors={}, **kwargs):
         """Plot interpolated feature trajectories within the component space to given Axes.
 
 This method can only be used to plot interpolated feature trajectories for a single condition into a provided matplotlib Axes.
@@ -740,8 +759,18 @@ labels : str, default=None
     With `labels='cluster'`, labels according to the cluster numbers are assigned.
     With `labels='condition'`, labels according to the condition identifier are assigned.
     Note that the legend is not shown by this method, but has to be activated externally by calling `ax.legend()` or similar after running this method.
+plotcolors : dict, default={}
+    Dictionary of color specifiers for matplotlib with feature identifiers as keys.
+    Can be used to define plot color per feature.
+    By default the default color cycle of matplotlib will be used.
+    Note that if a color specification is given as an additional keyword argument, that specification takes priority and overrides the value given in this argument!
 **kwargs : dict
     Additional arguments are passed to matplotlib's plot function and can be used to change the plot style etc.
+
+Returns
+---
+artists : dict
+    Dictionary of plot elements (`matplotlib.lines.Line2D`) keyed by feature identifiers.
 
 Example usage
 ---
@@ -749,7 +778,15 @@ Example usage
     >>> fig, ax = pyplot.subplots(1, 1)
     >>> pod_result = POD(dataset.read_csv("examples/exampledata1.csv", sample="Sample"))
     >>> interpolation = pod_result.interpolate_sample_weights()
-    >>> pod_result.plot_feature_interpolation_in(ax, interpolation)
+    >>> _ = pod_result.plot_feature_interpolation_in(ax, interpolation)
+
+Often we want raw data points and the interpolated trajectory to use the same colors for the same features.
+That can be achieved as follows:
+
+    >>> fig, ax = pyplot.subplots(1, 1)
+    >>> artists = pod_result.plot_feature_trajectory_in(ax)
+    >>> colors = dict([(f, artists[f].get_color()) for f in pod_result.features])
+    >>> _ = pod_result.plot_feature_interpolation_in(ax, interpolation, plotcolors=colors)
 """
         conditions = self._check_conditions(condition)
         condition = conditions[0] if conditions is not None else None
@@ -772,6 +809,7 @@ Example usage
         else:
             features = fs
         labelled = dict()
+        artists = dict()
         for i,f in enumerate(features):
             label = None
             color = None
@@ -787,6 +825,8 @@ Example usage
                     labelled[clusters[i]] = None
                 else:
                     color = labelled[clusters[i]].get_color()
+            if f in plotcolors:
+                color = plotcolors[f]
             fi = self.features.index(f)
             x = self.sing_values[components[0]] * phi0 * self.feature_weights[fi, components[0]]
             y = self.sing_values[components[1]] * phi1 * self.feature_weights[fi, components[1]]
@@ -794,6 +834,7 @@ Example usage
                 plot, = ax.plot(x, y, label=label, **kwargs)
             else:
                 plot, = ax.plot(x, y, label=label, color=color, **kwargs)
+            artists[f] = plot
             if label is not None:
                 if labels == 'condition':
                     labelled[condition] = plot
@@ -802,6 +843,7 @@ Example usage
             if annotate is not False:
                 if annotate is True or f in annotate:
                     ax.annotate(f, (x[0], y[0]))
+        return artists
 
 
     def _check_conditions(self, conditions):
