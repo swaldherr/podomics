@@ -292,7 +292,7 @@ annotate : Boolean or list of feature identifiers, default=False
 labels : str, default=None
     Which labels to assign for a possible plot legend.
     By default, no labels are assigned.
-    With `labels='clusters'`, labels according to the cluster numbers are assigned.
+    With `labels='cluster'`, labels according to the cluster numbers are assigned.
     If this argument is not `None` and a new figure is created, also shows the legend.
     If plotting in a given Axes, the legend has to be activated separately.
 **kwargs : 
@@ -322,7 +322,7 @@ Example usage
                 if len(fi) > 0:
                     x = self.feature_weights[fi, components[0]]
                     y = self.feature_weights[fi, components[1]]
-                    label = f"Cluster {l}" if labels=='clusters' else None
+                    label = f"Cluster {l}" if labels=='cluster' else None
                     if len(kwargs):
                         ax.plot(x, y, label=label, **kwargs)
                     else:
@@ -640,7 +640,7 @@ annotate : Boolean or list of feature identifiers, default=False
     To label only selected features, pass the identifiers of the desired features as list.
 labels : str, default=None
     Which labels to assign for a possible plot legend. By default, no labels are assigned.
-    With `labels='clusters'`, labels according to the cluster numbers are assigned.
+    With `labels='cluster'`, labels according to the cluster numbers are assigned.
     With `labels='condition'`, labels according to the condition identifier are assigned.
     If plotting in a given Axes, the legend has to be activated separately.
 **kwargs : dict
